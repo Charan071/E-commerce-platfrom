@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import React, { createContext, useContext, useState, useEffect, useRef, ReactNode } from "react";
 import { Product } from "./mock-data";
 
 export interface CartItem extends Product {
@@ -22,21 +22,28 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [cart, setCart] = useState<CartItem[]>([]);
+  const didHydrateCart = useRef(false);
 
   // Load from localStorage on initial mount
   useEffect(() => {
-    const savedCart = localStorage.getItem("anavasilks_cart");
-    if (savedCart) {
-      try {
-        setCart(JSON.parse(savedCart));
-      } catch (e) {
-        console.error("Failed to parse cart", e);
+    const timer = window.setTimeout(() => {
+      const savedCart = localStorage.getItem("anavasilks_cart");
+      if (savedCart) {
+        try {
+          setCart(JSON.parse(savedCart));
+        } catch (e) {
+          console.error("Failed to parse cart", e);
+        }
       }
-    }
+      didHydrateCart.current = true;
+    }, 0);
+
+    return () => window.clearTimeout(timer);
   }, []);
 
   // Save to localStorage whenever cart changes
   useEffect(() => {
+    if (!didHydrateCart.current) return;
     localStorage.setItem("anavasilks_cart", JSON.stringify(cart));
   }, [cart]);
 

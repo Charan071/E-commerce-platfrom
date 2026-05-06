@@ -1,0 +1,36 @@
+
+> anavasilks-frontend@0.1.0 dev
+> next dev --hostname 127.0.0.1
+
+▲ Next.js 16.2.4 (Turbopack)
+- Local:         http://127.0.0.1:3000
+- Network:       http://127.0.0.1:3000
+- Environments: .env.local, .env
+✓ Ready in 1454ms
+Creating turbopack project {
+  dir: 'C:\\Users\\chara\\OneDrive\\Documents\\my-projects\\e-commerce platform\\anavasilks-frontend',
+  testMode: true
+}
+
+ POST /api/products 403 in 1874ms (next.js: 1487ms, proxy.ts: 67ms, application-code: 319ms)
+prisma:error 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].product.findMany()` invocation in
+C:\Users\chara\OneDrive\Documents\my-projects\e-commerce platform\anavasilks-frontend\.next\dev\server\chunks\[root-of-the-server]__086jx-b._.js:252:150
+
+  249     }
+  250 };
+  251 const [products, total] = await Promise.all([
+→ 252     __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].product.findMany(
+The table `public.products` does not exist in the current database.
+ GET /api/products?limit=1 500 in 3.2s (next.js: 1480ms, proxy.ts: 71ms, application-code: 1678ms)
+○ Compiling / ...
+prisma:error 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].product.count()` invocation in
+C:\Users\chara\OneDrive\Documents\my-projects\e-commerce platform\anavasilks-frontend\.next\dev\server\chunks\[root-of-the-server]__086jx-b._.js:274:150
+
+  271         colors: true
+  272     }
+  273 }),
+→ 274 __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].product.count(
+The table `public.products` does not exist in the current database.
+ GET / 200 in 5.2s (next.js: 4.1s, proxy.ts: 587ms, application-code: 557ms)

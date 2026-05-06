@@ -196,7 +196,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
               </div>
             )}
             {activeTab !== "DESCRIPTION" && (
-              <p>Content for {activeTab.toLowerCase()} goes here. This section provides additional details about the product's care instructions, shipping policies, or specific material details.</p>
+              <p>Content for {activeTab.toLowerCase()} goes here. This section provides additional details about the product&apos;s care instructions, shipping policies, or specific material details.</p>
             )}
           </div>
         </div>
