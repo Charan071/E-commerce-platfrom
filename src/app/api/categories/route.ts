@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/auth";
+import { getSampleCategories, isExpectedSampleFallback } from "@/lib/sample-api";
 import { NextResponse } from "next/server";
 
 // GET /api/categories
@@ -11,8 +12,11 @@ export async function GET() {
     });
     return NextResponse.json(categories);
   } catch (error) {
-    console.error("[GET /api/categories]", error);
-    return NextResponse.json({ error: "Failed to fetch categories" }, { status: 500 });
+    if (!isExpectedSampleFallback(error)) {
+      console.error("[GET /api/categories]", error);
+    }
+
+    return NextResponse.json(getSampleCategories());
   }
 }
 

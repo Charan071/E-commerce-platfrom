@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/auth";
+import { getSampleProducts, isExpectedSampleFallback } from "@/lib/sample-api";
 import { NextRequest, NextResponse } from "next/server";
 
 // GET /api/products — list with optional filtering
@@ -45,8 +46,20 @@ export async function GET(req: NextRequest) {
       pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
     });
   } catch (error) {
-    console.error("[GET /api/products]", error);
-    return NextResponse.json({ error: "Failed to fetch products" }, { status: 500 });
+    if (!isExpectedSampleFallback(error)) {
+      console.error("[GET /api/products]", error);
+    }
+
+    const { searchParams } = req.nextUrl;
+    return NextResponse.json(
+      getSampleProducts({
+        category: searchParams.get("category"),
+        isNew: searchParams.get("isNew"),
+        search: searchParams.get("search"),
+        page: parseInt(searchParams.get("page") ?? "1"),
+        limit: parseInt(searchParams.get("limit") ?? "12"),
+      })
+    );
   }
 }
 

@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/auth";
+import { getSampleProduct, isExpectedSampleFallback } from "@/lib/sample-api";
 import { NextRequest, NextResponse } from "next/server";
 
 // GET /api/products/[id]
@@ -28,7 +29,17 @@ export async function GET(
 
     return NextResponse.json(product);
   } catch (error) {
-    console.error("[GET /api/products/[id]]", error);
+    if (!isExpectedSampleFallback(error)) {
+      console.error("[GET /api/products/[id]]", error);
+    }
+
+    const { id } = await params;
+    const product = getSampleProduct(id);
+
+    if (product) {
+      return NextResponse.json({ ...product, source: "sample" });
+    }
+
     return NextResponse.json({ error: "Failed to fetch product" }, { status: 500 });
   }
 }

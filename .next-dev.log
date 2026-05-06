@@ -34,3 +34,44 @@ C:\Users\chara\OneDrive\Documents\my-projects\e-commerce platform\anavasilks-fro
 → 274 __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].product.count(
 The table `public.products` does not exist in the current database.
  GET / 200 in 5.2s (next.js: 4.1s, proxy.ts: 587ms, application-code: 557ms)
+ POST /api/categories 403 in 468ms (next.js: 327ms, proxy.ts: 130ms, application-code: 12ms)
+prisma:error 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].product.findMany()` invocation in
+C:\Users\chara\OneDrive\Documents\my-projects\e-commerce platform\anavasilks-frontend\.next\dev\server\chunks\[root-of-the-server]__0gqdkc3._.js:565:150
+
+  562     }
+  563 };
+  564 const [products, total] = await Promise.all([
+→ 565     __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].product.findMany(
+The table `public.products` does not exist in the current database.
+ GET /api/products?limit=1 200 in 1183ms (next.js: 177ms, proxy.ts: 124ms, application-code: 883ms)
+prisma:error 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].product.count()` invocation in
+C:\Users\chara\OneDrive\Documents\my-projects\e-commerce platform\anavasilks-frontend\.next\dev\server\chunks\[root-of-the-server]__0gqdkc3._.js:587:150
+
+  584         colors: true
+  585     }
+  586 }),
+→ 587 __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].product.count(
+The table `public.products` does not exist in the current database.
+prisma:error 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].category.findMany()` invocation in
+C:\Users\chara\OneDrive\Documents\my-projects\e-commerce platform\anavasilks-frontend\.next\dev\server\chunks\[root-of-the-server]__043lj6e._.js:530:172
+
+  527 ;
+  528 async function GET() {
+  529     try {
+→ 530         const categories = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].category.findMany(
+The table `public.categories` does not exist in the current database.
+ GET /api/categories 200 in 1659ms (next.js: 336ms, proxy.ts: 123ms, application-code: 1201ms)
+ GET / 200 in 459ms (next.js: 133ms, proxy.ts: 24ms, application-code: 302ms)
+prisma:error 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].product.findUnique()` invocation in
+C:\Users\chara\OneDrive\Documents\my-projects\e-commerce platform\anavasilks-frontend\.next\dev\server\chunks\[root-of-the-server]__0ve0xw8._.js:533:168
+
+  530 async function GET(_req, { params }) {
+  531     try {
+  532         const { id } = await params;
+→ 533         const product = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].product.findUnique(
+The table `public.products` does not exist in the current database.
+ GET /api/products/p1 200 in 2.8s (next.js: 2.2s, proxy.ts: 28ms, application-code: 574ms)
