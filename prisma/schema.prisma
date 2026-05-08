@@ -48,6 +48,7 @@ model Address {
   user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   orders Order[]
 
+  @@index([userId])
   @@map("addresses")
 }
 
@@ -91,6 +92,8 @@ model Product {
   reviews    Review[]
   wishlist   WishlistItem[]
 
+  @@index([categoryId])
+  @@index([isActive, createdAt])
   @@map("products")
 }
 
@@ -104,6 +107,7 @@ model ProductImage {
 
   product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
+  @@index([productId])
   @@map("product_images")
 }
 
@@ -115,6 +119,7 @@ model ProductColor {
 
   product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
+  @@index([productId])
   @@map("product_colors")
 }
 
@@ -130,6 +135,7 @@ model WishlistItem {
   product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
   @@unique([userId, productId])
+  @@index([productId])
   @@map("wishlist_items")
 }
 
@@ -138,12 +144,21 @@ model WishlistItem {
 model Order {
   id              String      @id @default(uuid())
   orderNumber     String      @unique @default(cuid())
-  userId          String
-  addressId       String
+  userId          String?
+  addressId       String?
   status          OrderStatus @default(PENDING)
   paymentStatus   PaymentStatus @default(UNPAID)
   paymentMethod   String?
   paymentId       String?     // Razorpay / Stripe order id
+  customerName    String?
+  customerEmail   String?
+  customerPhone   String?
+  shippingLine1   String?
+  shippingLine2   String?
+  shippingCity    String?
+  shippingState   String?
+  shippingPincode String?
+  shippingCountry String?     @default("India")
   subtotal        Decimal     @db.Decimal(10, 2)
   shippingCost    Decimal     @db.Decimal(10, 2) @default(0)
   discount        Decimal     @db.Decimal(10, 2) @default(0)
@@ -152,10 +167,13 @@ model Order {
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt
 
-  user      User        @relation(fields: [userId], references: [id])
-  address   Address     @relation(fields: [addressId], references: [id])
+  user      User?       @relation(fields: [userId], references: [id])
+  address   Address?    @relation(fields: [addressId], references: [id])
   items     OrderItem[]
 
+  @@index([userId])
+  @@index([addressId])
+  @@index([status, createdAt])
   @@map("orders")
 }
 
@@ -190,6 +208,8 @@ model OrderItem {
   order   Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
   product Product @relation(fields: [productId], references: [id])
 
+  @@index([orderId])
+  @@index([productId])
   @@map("order_items")
 }
 
@@ -207,5 +227,101 @@ model Review {
   product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
   @@unique([userId, productId])
+  @@index([productId])
   @@map("reviews")
+}
+
+// ─── CMS / BRAND / HOMEPAGE CONTENT ──────────────────────────────────────────
+
+model BrandKit {
+  id               String   @id @default(cuid())
+  brandName        String   @default("AnavaSilks")
+  tagline          String   @default("Silk and Sarees")
+  voice            String?  @db.Text
+  primaryColor     String   @default("#171717")
+  secondaryColor   String   @default("#f6f4f0")
+  accentColor      String   @default("#8b6a3e")
+  surfaceColor     String   @default("#ffffff")
+  mutedTextColor   String   @default("#6b6b6b")
+  headingFont      String   @default("Playfair Display")
+  bodyFont         String   @default("Inter")
+  navLetterSpacing String   @default("0.22em")
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@map("brand_kit")
+}
+
+model HomeHero {
+  id            String   @id @default(cuid())
+  title         String
+  subtitle      String?
+  ctaLabel      String?  @default("Shop Here")
+  ctaHref       String?  @default("/collections")
+  imageUrl      String
+  imagePublicId String?
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([isActive])
+  @@map("home_hero")
+}
+
+model CollectionHighlight {
+  id            String   @id @default(cuid())
+  title         String
+  subtitle      String?
+  href          String   @default("/collections")
+  imageUrl      String
+  imagePublicId String?
+  imageHasEmbeddedText Boolean @default(false)
+  sortOrder     Int      @default(0)
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([isActive, sortOrder])
+  @@map("collection_highlights")
+}
+
+model NavPromoBlock {
+  id            String   @id @default(cuid())
+  title         String
+  subtitle      String?
+  href          String   @default("/collections")
+  imageUrl      String
+  imagePublicId String?
+  imageHasEmbeddedText Boolean @default(false)
+  sortOrder     Int      @default(0)
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([isActive, sortOrder])
+  @@map("nav_promo_blocks")
+}
+
+model AdminAuditLog {
+  id        String   @id @default(cuid())
+  userId    String
+  email     String?
+  action    String
+  target    String
+  details   Json?
+  createdAt DateTime @default(now())
+
+  @@index([userId, createdAt])
+  @@index([action, createdAt])
+  @@map("admin_audit_logs")
+}
+
+model NewsletterSubscription {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  source    String   @default("website")
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+  @@map("newsletter_subscriptions")
 }

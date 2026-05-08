@@ -53,7 +53,7 @@ export default async function AdminOrdersPage({ searchParams }: OrdersPageProps)
           value={formatCompactNumber(data.metrics.total)}
           detail="+28 this month"
           icon={ShoppingBag}
-          tone="red"
+          tone="brand"
         />
         <AdminMetricCard
           label="Pending"
@@ -91,14 +91,14 @@ export default async function AdminOrdersPage({ searchParams }: OrdersPageProps)
           <div className="flex flex-wrap gap-3">
             <button
               type="button"
-              className="inline-flex h-10 items-center gap-2 rounded-md border border-[#d9aaa9] px-4 text-sm font-medium text-[#b80012] hover:bg-red-50"
+              className="inline-flex h-10 items-center gap-2 rounded-md border border-[#d9aaa9] px-4 text-sm font-medium text-[var(--admin-primary)] hover:bg-red-50"
             >
               <Download size={16} />
               Export
             </button>
             <button
               type="button"
-              className="inline-flex h-10 items-center gap-2 rounded-md bg-[#b80012] px-4 text-sm font-medium text-white shadow-sm hover:bg-[#95000f]"
+              className="inline-flex h-10 items-center gap-2 rounded-md bg-[var(--admin-primary)] px-4 text-sm font-medium text-white shadow-sm hover:opacity-90"
             >
               <Plus size={16} />
               Add Order
@@ -150,14 +150,14 @@ export default async function AdminOrdersPage({ searchParams }: OrdersPageProps)
 
           <button
             type="submit"
-            className="inline-flex h-10 items-center justify-center gap-2 rounded-md border border-[#d9aaa9] px-4 text-sm font-medium text-[#b80012] hover:bg-red-50"
+            className="inline-flex h-10 items-center justify-center gap-2 rounded-md border border-[#d9aaa9] px-4 text-sm font-medium text-[var(--admin-primary)] hover:bg-red-50"
           >
             <Filter size={16} />
             Filters
           </button>
           <Link
             href="/admin/orders"
-            className="inline-flex h-10 items-center justify-center px-3 text-sm font-medium text-[#b80012]"
+            className="inline-flex h-10 items-center justify-center px-3 text-sm font-medium text-[var(--admin-primary)]"
           >
             Reset
           </Link>

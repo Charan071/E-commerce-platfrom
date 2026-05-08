@@ -33,7 +33,7 @@ export default async function AdminDashboardPage() {
           value={formatCurrency(data.metrics.revenue)}
           detail="+12.4% this month"
           icon={WalletCards}
-          tone="red"
+          tone="brand"
         />
         <AdminMetricCard
           label="Total Orders"
@@ -72,7 +72,10 @@ export default async function AdminDashboardPage() {
               <h2 className="font-serif text-2xl text-gray-950">Sales Overview</h2>
               <p className="mt-1 text-sm text-gray-500">Revenue across the last seven days</p>
             </div>
-            <Link href="/admin/orders" className="inline-flex items-center gap-1 text-sm font-medium text-[#b80012]">
+            <Link
+              href="/admin/orders"
+              className="inline-flex items-center gap-1 text-sm font-medium text-[var(--admin-primary)]"
+            >
               Orders
               <ArrowUpRight size={15} />
             </Link>
@@ -83,7 +86,7 @@ export default async function AdminDashboardPage() {
               <div key={item.label} className="flex h-full flex-1 flex-col justify-end gap-2">
                 <div className="flex min-h-0 flex-1 items-end">
                   <div
-                    className="w-full rounded-t-md bg-gradient-to-t from-[#b80012] to-[#e9a85c]"
+                    className="w-full rounded-t-md bg-gradient-to-t from-[var(--admin-primary)] to-[var(--admin-accent)]"
                     style={{ height: `${Math.max(8, (item.value / maxSales) * 100)}%` }}
                     title={formatCurrency(item.value)}
                   />
@@ -97,7 +100,7 @@ export default async function AdminDashboardPage() {
         <div className="rounded-lg border border-[#eadfd5] bg-white p-5 shadow-sm">
           <div className="flex items-center justify-between">
             <h2 className="font-serif text-2xl text-gray-950">Category Mix</h2>
-            <Link href="/admin/categories" className="text-sm font-medium text-[#b80012]">
+            <Link href="/admin/categories" className="text-sm font-medium text-[var(--admin-primary)]">
               Manage
             </Link>
           </div>
@@ -110,7 +113,7 @@ export default async function AdminDashboardPage() {
                 </div>
                 <div className="h-2 rounded-full bg-[#f3e7dc]">
                   <div
-                    className="h-2 rounded-full bg-[#8b1a1a]"
+                    className="h-2 rounded-full bg-[var(--admin-primary)]"
                     style={{ width: `${Math.max(6, (category.count / maxCategory) * 100)}%` }}
                   />
                 </div>
@@ -127,7 +130,7 @@ export default async function AdminDashboardPage() {
         <div className="rounded-lg border border-[#eadfd5] bg-white shadow-sm">
           <div className="flex items-center justify-between border-b border-[#eadfd5] px-5 py-4">
             <h2 className="font-serif text-2xl text-gray-950">Recent Orders</h2>
-            <Link href="/admin/orders" className="text-sm font-medium text-[#b80012]">
+            <Link href="/admin/orders" className="text-sm font-medium text-[var(--admin-primary)]">
               View all
             </Link>
           </div>
@@ -175,7 +178,10 @@ export default async function AdminDashboardPage() {
               <AlertTriangle size={20} className="text-orange-600" />
               <h2 className="font-serif text-2xl text-gray-950">Stock Alerts</h2>
             </div>
-            <Link href="/admin/products?status=LOW_STOCK" className="text-sm font-medium text-[#b80012]">
+            <Link
+              href="/admin/products?status=LOW_STOCK"
+              className="text-sm font-medium text-[var(--admin-primary)]"
+            >
               Resolve
             </Link>
           </div>

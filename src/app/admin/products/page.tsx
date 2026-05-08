@@ -16,6 +16,7 @@ import {
 import { AdminMetricCard } from "@/components/admin/AdminMetricCard";
 import { AdminPagination } from "@/components/admin/AdminPagination";
 import { AdminStatusBadge } from "@/components/admin/AdminStatusBadge";
+import { deleteProduct } from "@/app/admin/products/actions";
 import {
   formatCompactNumber,
   formatCurrency,
@@ -51,7 +52,7 @@ export default async function AdminProductsPage({ searchParams }: ProductsPagePr
           value={formatCompactNumber(data.metrics.total)}
           detail="+12 this month"
           icon={Package}
-          tone="red"
+          tone="brand"
         />
         <AdminMetricCard
           label="Total Categories"
@@ -65,7 +66,7 @@ export default async function AdminProductsPage({ searchParams }: ProductsPagePr
           value={formatCompactNumber(data.metrics.lowStock)}
           detail="View all"
           icon={Package}
-          tone="red"
+          tone="brand"
         />
         <AdminMetricCard
           label="Out of Stock"
@@ -79,7 +80,7 @@ export default async function AdminProductsPage({ searchParams }: ProductsPagePr
           value={formatCurrency(data.metrics.totalValue)}
           detail="Inventory value"
           icon={BarChart3}
-          tone="red"
+          tone="brand"
         />
       </section>
 
@@ -89,20 +90,27 @@ export default async function AdminProductsPage({ searchParams }: ProductsPagePr
           <div className="flex flex-wrap gap-3">
             <button
               type="button"
-              className="inline-flex h-10 items-center gap-2 rounded-md border border-[#d9aaa9] px-4 text-sm font-medium text-[#b80012] hover:bg-red-50"
+              className="inline-flex h-10 items-center gap-2 rounded-md border border-[#d9aaa9] px-4 text-sm font-medium text-[var(--admin-primary)] hover:bg-red-50"
             >
               <UploadCloud size={16} />
               Import Products
             </button>
-            <button
-              type="button"
-              className="inline-flex h-10 items-center gap-2 rounded-md bg-[#b80012] px-4 text-sm font-medium text-white shadow-sm hover:bg-[#95000f]"
+            <Link
+              href="/admin/products/new"
+              className="inline-flex h-10 items-center gap-2 rounded-md bg-[var(--admin-primary)] px-4 text-sm font-medium text-white shadow-sm hover:opacity-90"
             >
               <Plus size={16} />
               Add New Product
-            </button>
+            </Link>
           </div>
         </div>
+
+        {data.source === "sample" && (
+          <div className="mx-5 mt-4 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800">
+            Product data is currently in sample fallback mode. Connect database tables to enable persistent create,
+            edit, and delete behavior.
+          </div>
+        )}
 
         <form className="grid gap-3 border-b border-[#eadfd5] px-5 py-4 md:grid-cols-2 xl:grid-cols-[minmax(260px,1fr)_170px_170px_170px_auto_auto]">
           <label className="flex h-10 items-center gap-2 rounded-md border border-[#eadfd5] bg-white px-3 text-sm text-gray-500">
@@ -156,14 +164,14 @@ export default async function AdminProductsPage({ searchParams }: ProductsPagePr
 
           <button
             type="submit"
-            className="inline-flex h-10 items-center justify-center gap-2 rounded-md border border-[#d9aaa9] px-4 text-sm font-medium text-[#b80012] hover:bg-red-50"
+            className="inline-flex h-10 items-center justify-center gap-2 rounded-md border border-[#d9aaa9] px-4 text-sm font-medium text-[var(--admin-primary)] hover:bg-red-50"
           >
             <Filter size={16} />
             Filters
           </button>
           <Link
             href="/admin/products"
-            className="inline-flex h-10 items-center justify-center px-3 text-sm font-medium text-[#b80012]"
+            className="inline-flex h-10 items-center justify-center px-3 text-sm font-medium text-[var(--admin-primary)]"
           >
             Reset
           </Link>
@@ -219,15 +227,31 @@ export default async function AdminProductsPage({ searchParams }: ProductsPagePr
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-3">
-                      <button type="button" className="text-gray-700 hover:text-[#8b1a1a]" aria-label="View product">
+                      <Link
+                        href={`/product/${product.slug}`}
+                        target="_blank"
+                        className="text-gray-700 hover:text-[var(--admin-primary)]"
+                        aria-label="View product"
+                      >
                         <Eye size={16} />
-                      </button>
-                      <button type="button" className="text-gray-700 hover:text-[#8b1a1a]" aria-label="Edit product">
+                      </Link>
+                      <Link
+                        href={`/admin/products/${product.id}/edit`}
+                        className="text-gray-700 hover:text-[var(--admin-primary)]"
+                        aria-label="Edit product"
+                      >
                         <Edit3 size={16} />
-                      </button>
-                      <button type="button" className="text-[#b80012] hover:text-[#95000f]" aria-label="Delete product">
-                        <Trash2 size={16} />
-                      </button>
+                      </Link>
+                      <form action={deleteProduct.bind(null, product.id)}>
+                        <button
+                          type="submit"
+                          className="text-[var(--admin-primary)] hover:opacity-80"
+                          aria-label="Delete product"
+                          title="Soft delete (deactivate)"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </form>
                     </div>
                   </td>
                 </tr>

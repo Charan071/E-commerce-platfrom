@@ -1,9 +1,9 @@
 import type { LucideIcon } from "lucide-react";
 
-type Tone = "red" | "amber" | "green" | "blue" | "purple";
+type Tone = "brand" | "amber" | "green" | "blue" | "purple";
 
 const toneStyles: Record<Tone, { icon: string; text: string }> = {
-  red: { icon: "bg-red-50 text-red-700", text: "text-red-700" },
+  brand: { icon: "bg-neutral-100 text-[var(--admin-primary)]", text: "text-[var(--admin-primary)]" },
   amber: { icon: "bg-amber-50 text-amber-700", text: "text-amber-700" },
   green: { icon: "bg-green-50 text-green-700", text: "text-green-700" },
   blue: { icon: "bg-blue-50 text-blue-700", text: "text-blue-700" },
@@ -15,7 +15,7 @@ export function AdminMetricCard({
   value,
   detail,
   icon: Icon,
-  tone = "red",
+  tone = "brand",
 }: {
   label: string;
   value: string | number;

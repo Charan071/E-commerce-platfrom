@@ -1,15 +1,21 @@
 import { createClient } from "@/lib/supabase/server";
+import { prisma } from "@/lib/prisma";
 
 type AuthClaims = {
   sub?: string;
   email?: string;
   app_metadata?: unknown;
+  user_metadata?: unknown;
+  aal?: string;
+  amr?: unknown;
 };
 
 export type AuthContext = {
   userId: string;
   email?: string;
+  name?: string;
   isAdmin: boolean;
+  hasMfa: boolean;
 };
 
 function normalizeRole(value: unknown) {
@@ -35,6 +41,32 @@ export function claimsAreAdmin(claims: AuthClaims | null | undefined) {
   return hasAdminRole(claims?.app_metadata);
 }
 
+export function claimsHaveMfa(claims: AuthClaims | null | undefined) {
+  if (!claims) return false;
+  if (claims.aal === "aal2") return true;
+  if (!Array.isArray(claims.amr)) return false;
+  return claims.amr.some((factor) => {
+    if (!factor || typeof factor !== "object") return false;
+    const method = (factor as Record<string, unknown>).method;
+    return (
+      typeof method === "string" &&
+      ["totp", "otp", "sms", "webauthn"].includes(method.toLowerCase())
+    );
+  });
+}
+
+function pickStringMetadata(metadata: unknown, keys: string[]) {
+  if (!metadata || typeof metadata !== "object") return undefined;
+  const record = metadata as Record<string, unknown>;
+  for (const key of keys) {
+    const value = record[key];
+    if (typeof value === "string" && value.trim().length > 0) {
+      return value.trim();
+    }
+  }
+  return undefined;
+}
+
 export async function getAuthContext(): Promise<AuthContext | null> {
   const supabase = await createClient();
   const { data, error } = await supabase.auth.getClaims();
@@ -47,11 +79,39 @@ export async function getAuthContext(): Promise<AuthContext | null> {
   return {
     userId,
     email: claims.email,
+    name: pickStringMetadata(claims.user_metadata, ["full_name", "name"]),
     isAdmin: claimsAreAdmin(claims),
+    hasMfa: claimsHaveMfa(claims),
   };
+}
+
+export async function isAdminFromDatabase(userId: string) {
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { role: true },
+    });
+    return user?.role === "ADMIN";
+  } catch {
+    return false;
+  }
 }
 
 export async function requireAdmin() {
   const auth = await getAuthContext();
-  return auth?.isAdmin ? auth : null;
+  if (!auth) return null;
+
+  const jwtAdmin = auth.isAdmin;
+  const dbAdmin = jwtAdmin ? true : await isAdminFromDatabase(auth.userId);
+  const isAdmin = jwtAdmin || dbAdmin;
+
+  if (!isAdmin) return null;
+
+  const requireMfa = process.env.ADMIN_REQUIRE_MFA === "true";
+  if (requireMfa && !auth.hasMfa) return null;
+
+  return {
+    ...auth,
+    isAdmin,
+  };
 }

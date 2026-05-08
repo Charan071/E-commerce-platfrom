@@ -1,8 +1,8 @@
 import React from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Heart } from "lucide-react";
 import { Product } from "@/lib/mock-data";
+import { WishlistHeartButton } from "@/components/product/WishlistHeartButton";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -13,19 +13,19 @@ function cn(...inputs: ClassValue[]) {
 interface ProductCardProps {
   product: Product;
   className?: string;
+  initiallyWishlisted?: boolean;
 }
 
-export function ProductCard({ product, className }: ProductCardProps) {
+export function ProductCard({ product, className, initiallyWishlisted = false }: ProductCardProps) {
   return (
-    <div className={cn("group relative flex flex-col bg-white rounded-sm overflow-hidden", className)}>
-      {/* Image container */}
-      <div className="relative aspect-[3/4] w-full overflow-hidden bg-gray-100">
+    <div className={cn("group relative flex flex-col bg-transparent overflow-hidden", className)}>
+      <div className="relative aspect-[3/4] w-full overflow-hidden bg-[#f2efe9]">
         <Link href={`/product/${product.id}`} className="block relative w-full h-full">
           <Image
             src={product.image}
             alt={product.title}
             fill
-            className="object-cover object-center transition-transform duration-700 group-hover:scale-105"
+            className="object-cover object-center transition-transform duration-700 ease-out group-hover:scale-[1.04]"
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           />
         </Link>
@@ -33,33 +33,37 @@ export function ProductCard({ product, className }: ProductCardProps) {
         {/* Badges */}
         <div className="absolute top-3 left-3 flex flex-col gap-2">
           {product.isNew && (
-            <span className="bg-primary text-white text-[10px] font-bold px-2 py-1 uppercase tracking-wider">
+            <span className="bg-[var(--color-text)] text-[var(--color-surface)] text-[10px] font-medium px-2 py-1 uppercase tracking-[0.18em]">
               New
             </span>
           )}
           {product.discount && (
-            <span className="bg-white text-primary text-[10px] font-bold px-2 py-1 uppercase tracking-wider">
+            <span className="bg-[var(--color-surface)] text-[var(--color-text)] border border-neutral-200/80 text-[10px] font-medium px-2 py-1 uppercase tracking-[0.18em]">
               {product.discount}
             </span>
           )}
         </div>
 
-        {/* Wishlist Button */}
-        <button className="absolute top-3 right-3 w-8 h-8 bg-white/80 rounded-full flex items-center justify-center text-gray-500 hover:text-primary hover:bg-white transition-colors">
-          <Heart className="w-4 h-4" />
-        </button>
+        <div className="absolute top-3 right-3 w-8 h-8 bg-white/90 rounded-full flex items-center justify-center text-text-muted hover:text-[var(--color-text)] hover:bg-white transition-colors shadow-sm">
+          <WishlistHeartButton
+            productId={product.id}
+            productTitle={product.title}
+            initialInWishlist={initiallyWishlisted}
+            className="h-full w-full"
+            iconClassName="w-4 h-4"
+          />
+        </div>
       </div>
 
-      {/* Product Details */}
-      <div className="pt-4 pb-2 flex flex-col flex-grow">
+      <div className="pt-4 pb-1 flex flex-col flex-grow">
         <div className="flex justify-between items-start mb-1">
-          <Link href={`/product/${product.id}`} className="block group-hover:text-primary transition-colors">
-            <h3 className="font-serif font-semibold text-lg text-text line-clamp-1">{product.title}</h3>
+          <Link href={`/product/${product.id}`} className="block group-hover:text-[var(--color-text)] transition-colors">
+            <h3 className="font-serif text-[17px] text-text line-clamp-1">{product.title}</h3>
           </Link>
         </div>
         
         <div className="flex items-center gap-2 mb-3">
-          <span className="font-bold text-primary">₹{product.price.toLocaleString("en-IN")}</span>
+          <span className="text-sm font-medium text-text">Rs. {product.price.toLocaleString("en-IN")}</span>
           {product.originalPrice && (
             <span className="text-sm text-text-muted line-through">₹{product.originalPrice.toLocaleString("en-IN")}</span>
           )}

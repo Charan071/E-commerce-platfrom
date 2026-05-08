@@ -298,6 +298,9 @@ function normalizeOrder(order: {
   paymentStatus: string;
   paymentMethod: string | null;
   total: unknown;
+  customerName?: string | null;
+  customerEmail?: string | null;
+  customerPhone?: string | null;
   user?: { name: string | null; email: string; phone: string | null } | null;
   address?: { fullName: string; phone: string } | null;
   items?: unknown[];
@@ -305,9 +308,9 @@ function normalizeOrder(order: {
   return {
     id: order.id,
     orderNumber: order.orderNumber,
-    customerName: order.address?.fullName ?? order.user?.name ?? "Customer",
-    customerEmail: order.user?.email ?? "",
-    customerPhone: order.address?.phone ?? order.user?.phone ?? "",
+    customerName: order.address?.fullName ?? order.customerName ?? order.user?.name ?? "Customer",
+    customerEmail: order.customerEmail ?? order.user?.email ?? "",
+    customerPhone: order.address?.phone ?? order.customerPhone ?? order.user?.phone ?? "",
     createdAt: order.createdAt.toISOString(),
     status: order.status,
     paymentStatus: order.paymentStatus,

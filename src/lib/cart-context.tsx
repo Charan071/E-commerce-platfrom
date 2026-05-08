@@ -16,12 +16,14 @@ interface CartContextType {
   clearCart: () => void;
   cartTotal: number;
   cartCount: number;
+  isHydrated: boolean;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [cart, setCart] = useState<CartItem[]>([]);
+  const [isHydrated, setIsHydrated] = useState(false);
   const didHydrateCart = useRef(false);
 
   // Load from localStorage on initial mount
@@ -36,6 +38,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         }
       }
       didHydrateCart.current = true;
+      setIsHydrated(true);
     }, 0);
 
     return () => window.clearTimeout(timer);
@@ -89,6 +92,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         clearCart,
         cartTotal,
         cartCount,
+        isHydrated,
       }}
     >
       {children}

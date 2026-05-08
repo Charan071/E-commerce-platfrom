@@ -46,8 +46,8 @@ export function AdminPagination({
             className={clsx(
               "flex h-9 min-w-9 items-center justify-center rounded-md border px-3 text-sm font-medium",
               item === page
-                ? "border-[#b80012] bg-[#b80012] text-white"
-                : "border-[#eadfd5] bg-white text-gray-700 hover:text-[#8b1a1a]"
+                ? "border-[var(--admin-primary)] bg-[var(--admin-primary)] text-white"
+                : "border-[#eadfd5] bg-white text-gray-700 hover:text-[var(--admin-primary)]"
             )}
           >
             {item}
