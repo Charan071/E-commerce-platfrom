@@ -21,8 +21,8 @@ export default async function AdminCustomersPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-xl font-semibold text-gray-900">Customers</h2>
-        <p className="text-sm text-gray-500 mt-1">Registered accounts synced from checkout and auth.</p>
+        <h2 className="font-serif text-2xl text-[#1e140d]">Customers</h2>
+        <p className="text-sm text-[#7c6652] mt-1">Registered accounts synced from checkout and auth.</p>
       </div>
 
       <div className="rounded-xl border border-[#eadfd5] bg-white overflow-hidden">
@@ -45,7 +45,7 @@ export default async function AdminCustomersPage() {
               </tr>
             ) : (
               users.map((u) => (
-                <tr key={u.id} className="hover:bg-gray-50/80">
+                <tr key={u.id} className="hover:bg-[#fdf8f4]">
                   <td className="px-4 py-3 text-gray-600 whitespace-nowrap">
                     {u.createdAt.toLocaleDateString()}
                   </td>

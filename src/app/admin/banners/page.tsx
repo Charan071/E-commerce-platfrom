@@ -4,8 +4,8 @@ export default function AdminBannersPage() {
   return (
     <div className="space-y-6 max-w-2xl">
       <div>
-        <h2 className="text-xl font-semibold text-gray-900">Banners &amp; highlights</h2>
-        <p className="text-sm text-gray-500 mt-1">
+        <h2 className="font-serif text-2xl text-[#1e140d]">Banners &amp; highlights</h2>
+        <p className="text-sm text-[#7c6652] mt-1">
           Homepage visual blocks and featured collection tiles are managed as structured content, not separate
           banner records.
         </p>

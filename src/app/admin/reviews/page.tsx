@@ -22,8 +22,8 @@ export default async function AdminReviewsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-xl font-semibold text-gray-900">Reviews</h2>
-        <p className="text-sm text-gray-500 mt-1">Customer ratings and comments tied to catalog products.</p>
+        <h2 className="font-serif text-2xl text-[#1e140d]">Reviews</h2>
+        <p className="text-sm text-[#7c6652] mt-1">Customer ratings and comments tied to catalog products.</p>
       </div>
 
       <div className="rounded-xl border border-[#eadfd5] bg-white overflow-hidden">
@@ -46,7 +46,7 @@ export default async function AdminReviewsPage() {
               </tr>
             ) : (
               reviews.map((rev) => (
-                <tr key={rev.id} className="hover:bg-gray-50/80 align-top">
+                <tr key={rev.id} className="hover:bg-[#fdf8f4] align-top">
                   <td className="px-4 py-3 text-gray-600 whitespace-nowrap">
                     {rev.createdAt.toLocaleDateString()}
                   </td>

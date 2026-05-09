@@ -32,10 +32,10 @@ export default async function AdminProductEditPage({ params }: AdminProductEditP
     <div className="space-y-6">
       <div className="flex items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-semibold text-gray-900">Edit Product</h2>
-          <p className="mt-1 text-sm text-gray-500">Update storefront content, pricing, and stock.</p>
+          <h2 className="font-serif text-2xl text-[#1e140d]">Edit Product</h2>
+          <p className="mt-1 text-sm text-[#7c6652]">Update storefront content, pricing, and stock.</p>
         </div>
-        <Link href="/admin/products" className="text-sm font-medium text-[var(--admin-primary)] hover:underline">
+        <Link href="/admin/products" className="text-sm font-medium text-[var(--admin-primary)] hover:opacity-75 transition-opacity">
           Back to products
         </Link>
       </div>

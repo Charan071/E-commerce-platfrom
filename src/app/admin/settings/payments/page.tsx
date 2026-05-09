@@ -13,8 +13,8 @@ export default function AdminPaymentsSettingsPage() {
   return (
     <div className="space-y-6 max-w-2xl">
       <div>
-        <h2 className="text-xl font-semibold text-gray-900">Payments</h2>
-        <p className="text-sm text-gray-500 mt-1">
+        <h2 className="font-serif text-2xl text-[#1e140d]">Payments</h2>
+        <p className="text-sm text-[#7c6652] mt-1">
           Checkout currently supports COD and cart totals. Payment gateway keys belong in server env (never
           <code className="mx-1">NEXT_PUBLIC_</code>).
         </p>

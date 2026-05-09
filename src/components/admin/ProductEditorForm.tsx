@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { X, Plus } from "lucide-react";
+import { ImagePlus, X, Plus } from "lucide-react";
 
 type CategoryOption = {
   id: string;
@@ -47,6 +47,11 @@ function buildDiscountLabel(priceValue: string, originalPriceValue: string) {
 
 const EMPTY_IMAGE: ImageEntry = { url: "", isHover: false };
 
+const inputClass =
+  "mt-1 w-full rounded-md border border-[#e5d8cc] bg-white px-3 py-2 text-sm text-[#1e140d] placeholder:text-[#b09880] outline-none focus:border-[var(--admin-primary)] focus:ring-1 focus:ring-[var(--admin-primary)]/20 transition";
+
+const labelClass = "text-[11px] font-semibold uppercase tracking-widest text-[#9c8270]";
+
 export function ProductEditorForm({
   action,
   submitLabel,
@@ -76,7 +81,8 @@ export function ProductEditorForm({
     categories.find((c) => c.id === selectedCategoryId)?.name ||
     (shouldAddCategory && newCategoryName ? newCategoryName : "Uncategorized");
 
-  const previewImage = images[0]?.url || "/images/saree-1.png";
+  const hasPreviewImage = images.some((img) => img.url.trim());
+  const previewImageUrl = images.find((img) => img.url.trim())?.url ?? "";
   const previewPrice = Number(price);
   const previewOriginalPrice = Number(originalPrice);
   const hasValidPrice = Number.isFinite(previewPrice) && previewPrice > 0;
@@ -113,43 +119,46 @@ export function ProductEditorForm({
   return (
     <form action={action} className="grid gap-5 lg:grid-cols-[3fr_2fr]">
       {/* ── Left: core product fields ── */}
-      <div className="rounded-xl border border-[#eadfd5] bg-white p-5 space-y-4">
+      <div className="rounded-xl border border-[#e5d8cc] bg-white p-6 shadow-sm space-y-5">
         <div className="grid gap-4 md:grid-cols-2">
           <div>
-            <label className="text-xs font-medium uppercase tracking-wide text-gray-600">Title</label>
+            <label className={labelClass}>Title</label>
             <input
               name="title"
               required
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="mt-1 w-full rounded-md border border-[#eadfd5] px-3 py-2 text-sm"
+              placeholder="e.g. Kanchipuram Silk Saree"
+              className={inputClass}
             />
           </div>
           <div>
-            <label className="text-xs font-medium uppercase tracking-wide text-gray-600">Slug (optional)</label>
+            <label className={labelClass}>Slug <span className="normal-case font-normal text-[#b09880]">(auto-generated if blank)</span></label>
             <input
               name="slug"
               defaultValue={initialValues.slug}
-              className="mt-1 w-full rounded-md border border-[#eadfd5] px-3 py-2 text-sm"
+              placeholder="kanchipuram-silk-saree"
+              className={inputClass}
             />
           </div>
         </div>
 
         <div>
-          <label className="text-xs font-medium uppercase tracking-wide text-gray-600">Description</label>
+          <label className={labelClass}>Description</label>
           <textarea
             name="description"
             required
             rows={5}
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            className="mt-1 w-full rounded-md border border-[#eadfd5] px-3 py-2 text-sm"
+            placeholder="Describe the fabric, weave, occasion, and care instructions…"
+            className={inputClass + " resize-none"}
           />
         </div>
 
         <div className="grid gap-4 grid-cols-2 md:grid-cols-4">
           <div>
-            <label className="text-xs font-medium uppercase tracking-wide text-gray-600">Price</label>
+            <label className={labelClass}>Price <span className="font-normal text-[#b09880]">(₹)</span></label>
             <input
               name="price"
               type="number"
@@ -158,11 +167,12 @@ export function ProductEditorForm({
               required
               value={price}
               onChange={(e) => setPrice(e.target.value)}
-              className="mt-1 w-full rounded-md border border-[#eadfd5] px-3 py-2 text-sm"
+              placeholder="0"
+              className={inputClass}
             />
           </div>
           <div>
-            <label className="text-xs font-medium uppercase tracking-wide text-gray-600">Original price</label>
+            <label className={labelClass}>Original <span className="font-normal text-[#b09880]">(₹)</span></label>
             <input
               name="originalPrice"
               type="number"
@@ -170,11 +180,12 @@ export function ProductEditorForm({
               step="0.01"
               value={originalPrice}
               onChange={(e) => setOriginalPrice(e.target.value)}
-              className="mt-1 w-full rounded-md border border-[#eadfd5] px-3 py-2 text-sm"
+              placeholder="0"
+              className={inputClass}
             />
           </div>
           <div>
-            <label className="text-xs font-medium uppercase tracking-wide text-gray-600">Stock</label>
+            <label className={labelClass}>Stock</label>
             <input
               name="stock"
               type="number"
@@ -183,15 +194,17 @@ export function ProductEditorForm({
               required
               value={stock}
               onChange={(e) => setStock(e.target.value)}
-              className="mt-1 w-full rounded-md border border-[#eadfd5] px-3 py-2 text-sm"
+              placeholder="0"
+              className={inputClass}
             />
           </div>
           <div>
-            <label className="text-xs font-medium uppercase tracking-wide text-gray-600">Discount label</label>
+            <label className={labelClass}>Discount label</label>
             <input
               value={discountLabel}
               readOnly
-              className="mt-1 w-full rounded-md border border-[#eadfd5] bg-gray-50 px-3 py-2 text-sm text-gray-700"
+              placeholder="Auto-calculated"
+              className={inputClass + " bg-[#faf8f5] cursor-default"}
             />
             <input type="hidden" name="discount" value={discountLabel} />
           </div>
@@ -199,19 +212,19 @@ export function ProductEditorForm({
 
         <div className="grid gap-4 md:grid-cols-2">
           <div>
-            <label className="text-xs font-medium uppercase tracking-wide text-gray-600">Category</label>
+            <label className={labelClass}>Category</label>
             <select
               name="categoryId"
               required
               value={selectedCategoryId}
               onChange={(e) => setSelectedCategoryId(e.target.value)}
-              className="mt-1 w-full rounded-md border border-[#eadfd5] px-3 py-2 text-sm bg-white"
+              className={inputClass + " appearance-none bg-white cursor-pointer"}
             >
               <option value="">Select category</option>
               {categories.map((cat) => (
                 <option key={cat.id} value={cat.id}>{cat.name}</option>
               ))}
-              <option value={ADD_CATEGORY_VALUE}>+ Add category</option>
+              <option value={ADD_CATEGORY_VALUE}>+ Add new category</option>
             </select>
             {shouldAddCategory && (
               <input
@@ -219,59 +232,74 @@ export function ProductEditorForm({
                 required
                 value={newCategoryName}
                 onChange={(e) => setNewCategoryName(e.target.value)}
-                placeholder="Enter new category name"
-                className="mt-2 w-full rounded-md border border-[#eadfd5] px-3 py-2 text-sm"
+                placeholder="New category name"
+                className={inputClass + " mt-2"}
               />
             )}
           </div>
           <div>
-            <label className="text-xs font-medium uppercase tracking-wide text-gray-600">Material</label>
+            <label className={labelClass}>Material / Fabric</label>
             <input
               name="material"
               required
               value={material}
               onChange={(e) => setMaterial(e.target.value)}
-              className="mt-1 w-full rounded-md border border-[#eadfd5] px-3 py-2 text-sm"
+              placeholder="e.g. Pure Silk"
+              className={inputClass}
             />
           </div>
         </div>
       </div>
 
-      {/* ── Right: preview (desktop) + images + publish ── */}
+      {/* ── Right: preview + images + publish ── */}
       <div className="flex flex-col gap-4">
-        {/* Preview card — desktop only, sticky */}
-        <div className="hidden lg:block sticky top-6 rounded-xl border border-[#eadfd5] bg-white p-4 shadow-sm">
-          <p className="text-xs font-medium uppercase tracking-wide text-gray-500 mb-3">Live card preview</p>
-          <div className="overflow-hidden rounded-lg border border-[#eadfd5] bg-[#faf8f5]">
-            <div className="relative aspect-[3/4] bg-[#f0ece7]">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={previewImage} alt={title || "Product preview"} className="h-full w-full object-cover" />
+        {/* Live preview card — desktop only */}
+        <div className="hidden lg:block rounded-xl border border-[#e5d8cc] bg-white p-4 shadow-sm">
+          <p className={labelClass + " mb-3"}>Live card preview</p>
+          <div className="overflow-hidden rounded-lg border border-[#e5d8cc] bg-[#faf8f5]">
+            <div className="relative aspect-[3/4] bg-[#f0e6dc]">
+              {hasPreviewImage ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={previewImageUrl}
+                  alt={title || "Product preview"}
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                <div className="h-full w-full flex flex-col items-center justify-center gap-2">
+                  <ImagePlus className="h-10 w-10 text-[#c9b09c]" strokeWidth={1.4} />
+                  <span className="text-xs text-[#b09880] tracking-wide">Paste an image URL below</span>
+                </div>
+              )}
               {discountLabel && (
-                <span className="absolute left-2 top-2 rounded bg-white/95 px-2 py-1 text-[10px] font-semibold text-gray-800">
+                <span className="absolute left-2 top-2 rounded bg-white/95 px-2 py-1 text-[10px] font-semibold text-[#2c1810]">
                   {discountLabel}
                 </span>
               )}
               {isNew && (
-                <span className="absolute right-2 top-2 rounded bg-[var(--admin-primary)] px-2 py-1 text-[10px] font-semibold text-white">
+                <span
+                  className="absolute right-2 top-2 rounded px-2 py-1 text-[10px] font-semibold text-white"
+                  style={{ backgroundColor: "var(--admin-primary)" }}
+                >
                   NEW
                 </span>
               )}
             </div>
             <div className="space-y-1 p-3">
-              <p className="line-clamp-2 text-sm font-medium text-gray-900">{title || "Product title"}</p>
-              <p className="text-xs text-gray-500">{selectedCategory}</p>
+              <p className="line-clamp-2 text-sm font-medium text-[#1e140d]">{title || "Product title"}</p>
+              <p className="text-xs text-[#9c8270]">{selectedCategory}</p>
               <div className="flex items-baseline gap-2">
-                <span className="text-sm font-semibold text-gray-900">
+                <span className="text-sm font-semibold text-[#1e140d]">
                   {hasValidPrice ? `Rs. ${previewPrice.toLocaleString("en-IN")}` : "Rs. 0"}
                 </span>
                 {hasValidOriginalPrice && (
-                  <span className="text-xs text-gray-500 line-through">
+                  <span className="text-xs text-[#9c8270] line-through">
                     Rs. {previewOriginalPrice.toLocaleString("en-IN")}
                   </span>
                 )}
               </div>
-              <p className="text-xs text-gray-600">{material || "Material"}</p>
-              <p className="text-xs text-gray-500">{stockState}</p>
+              <p className="text-xs text-[#7c6652]">{material || "Material"}</p>
+              <p className="text-xs text-[#9c8270]">{stockState}</p>
             </div>
           </div>
           {images.filter((img) => img.url).length > 1 && (
@@ -282,45 +310,47 @@ export function ProductEditorForm({
                   key={i}
                   src={img.url}
                   alt={`Image ${i + 1}`}
-                  className="h-12 w-9 shrink-0 rounded object-cover border border-[#eadfd5]"
+                  className="h-12 w-9 shrink-0 rounded object-cover border border-[#e5d8cc]"
                 />
               ))}
             </div>
           )}
-          <p className="mt-2 text-[11px] text-gray-400">
-            Preview updates as you type. Final card also depends on image/color data.
+          <p className="mt-2 text-[11px] text-[#b09880]">
+            Preview updates as you type.
           </p>
         </div>
 
         {/* Images + publish — always visible */}
-        <div className="rounded-xl border border-[#eadfd5] bg-white p-4 shadow-sm space-y-4">
+        <div className="rounded-xl border border-[#e5d8cc] bg-white p-5 shadow-sm space-y-5">
           {/* Multi-image manager */}
           <div>
             <div className="flex items-center justify-between mb-3">
-              <label className="text-xs font-medium uppercase tracking-wide text-gray-600">
-                Product images
-              </label>
+              <label className={labelClass}>Product images</label>
               <button
                 type="button"
                 onClick={addImage}
-                className="inline-flex items-center gap-1 text-xs text-[var(--admin-accent,#8b6a3e)] hover:underline"
+                className="inline-flex items-center gap-1.5 text-xs font-medium text-[var(--admin-primary)] hover:opacity-75 transition-opacity"
               >
-                <Plus className="h-3 w-3" />
+                <Plus className="h-3.5 w-3.5" />
                 Add image
               </button>
             </div>
 
             <div className="space-y-3">
               {images.map((img, idx) => (
-                <div key={idx} className="rounded-lg border border-[#eadfd5] p-3 space-y-2">
-                  <div className="flex items-start gap-2">
-                    {img.url && (
+                <div key={idx} className="rounded-lg border border-[#e5d8cc] bg-[#faf8f5] p-3 space-y-2">
+                  <div className="flex items-start gap-2.5">
+                    {img.url ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
                         src={img.url}
                         alt=""
-                        className="h-14 w-11 shrink-0 rounded object-cover border border-[#eadfd5]"
+                        className="h-14 w-11 shrink-0 rounded object-cover border border-[#e5d8cc]"
                       />
+                    ) : (
+                      <div className="h-14 w-11 shrink-0 rounded border border-dashed border-[#d4c4b4] bg-white flex items-center justify-center">
+                        <ImagePlus className="h-5 w-5 text-[#c9b09c]" strokeWidth={1.4} />
+                      </div>
                     )}
                     <div className="flex-1 min-w-0">
                       <input
@@ -329,7 +359,7 @@ export function ProductEditorForm({
                         value={img.url}
                         onChange={(e) => updateUrl(idx, e.target.value)}
                         placeholder="https://res.cloudinary.com/…"
-                        className="w-full rounded-md border border-[#eadfd5] px-2 py-1.5 text-xs"
+                        className="w-full rounded-md border border-[#e5d8cc] bg-white px-2 py-1.5 text-xs text-[#1e140d] placeholder:text-[#c9b09c] outline-none focus:border-[var(--admin-primary)] transition"
                       />
                     </div>
                     {images.length > 1 && (
@@ -337,7 +367,7 @@ export function ProductEditorForm({
                         type="button"
                         onClick={() => removeImage(idx)}
                         aria-label="Remove image"
-                        className="mt-1 shrink-0 text-gray-300 hover:text-red-500 transition-colors"
+                        className="mt-1 shrink-0 text-[#c9b09c] hover:text-[var(--admin-primary)] transition-colors"
                       >
                         <X className="h-4 w-4" />
                       </button>
@@ -346,17 +376,17 @@ export function ProductEditorForm({
 
                   <div className="flex items-center gap-3">
                     {idx === 0 && (
-                      <span className="text-[10px] uppercase tracking-wide text-gray-400 font-medium">
+                      <span className="text-[10px] uppercase tracking-widest text-[#b09880] font-semibold">
                         Primary
                       </span>
                     )}
-                    <label className="flex items-center gap-1.5 text-xs text-gray-600 cursor-pointer select-none">
+                    <label className="flex items-center gap-1.5 text-xs text-[#6b5040] cursor-pointer select-none">
                       <input
                         type="checkbox"
                         name={`imageHover_${idx}`}
                         checked={img.isHover}
                         onChange={() => toggleHover(idx)}
-                        className="h-3 w-3 rounded border-[#d9c7b8]"
+                        className="h-3 w-3 rounded border-[#d4c4b4]"
                       />
                       Hover image
                     </label>
@@ -364,19 +394,19 @@ export function ProductEditorForm({
                 </div>
               ))}
             </div>
-            <p className="mt-2 text-[11px] text-gray-400">
+            <p className="mt-2 text-[11px] text-[#b09880]">
               Paste Cloudinary delivery URLs. First image is the primary gallery image.
             </p>
           </div>
 
           {/* New arrival flag */}
-          <label className="inline-flex items-center gap-2 text-sm text-gray-700 cursor-pointer select-none">
+          <label className="inline-flex items-center gap-2 text-sm text-[#6b5040] cursor-pointer select-none">
             <input
               type="checkbox"
               name="isNew"
               checked={isNew}
               onChange={(e) => setIsNew(e.target.checked)}
-              className="h-4 w-4 rounded border-[#d9c7b8]"
+              className="h-4 w-4 rounded border-[#d4c4b4]"
             />
             Mark as New Arrival
           </label>
@@ -384,7 +414,8 @@ export function ProductEditorForm({
           {/* Submit */}
           <button
             type="submit"
-            className="w-full inline-flex h-10 items-center justify-center rounded-md bg-[var(--admin-primary)] px-4 text-sm font-medium text-white"
+            className="w-full inline-flex h-11 items-center justify-center rounded-md px-4 text-sm font-semibold text-white tracking-wide shadow-sm hover:opacity-90 transition-opacity"
+            style={{ backgroundColor: "var(--admin-primary)" }}
           >
             {submitLabel}
           </button>

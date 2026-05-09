@@ -17,8 +17,8 @@ export default async function AdminNewsletterPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-xl font-semibold text-gray-900">Newsletter subscribers</h2>
-        <p className="text-sm text-gray-500 mt-1">
+        <h2 className="font-serif text-2xl text-[#1e140d]">Newsletter subscribers</h2>
+        <p className="text-sm text-[#7c6652] mt-1">
           Emails captured from the storefront signup forms ({rows.length} total).
         </p>
       </div>
@@ -41,7 +41,7 @@ export default async function AdminNewsletterPage() {
               </tr>
             ) : (
               rows.map((row) => (
-                <tr key={row.id} className="hover:bg-gray-50/80">
+                <tr key={row.id} className="hover:bg-[#fdf8f4]">
                   <td className="px-4 py-3 text-gray-600 whitespace-nowrap">
                     {row.createdAt.toLocaleString()}
                   </td>

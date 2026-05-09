@@ -18,8 +18,8 @@ export default async function AdminCategoriesPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-xl font-semibold text-gray-900">Categories</h2>
-        <p className="text-sm text-gray-500 mt-1">
+        <h2 className="font-serif text-2xl text-[#1e140d]">Categories</h2>
+        <p className="text-sm text-[#7c6652] mt-1">
           Taxonomy used on the shop filters and navigation. Slugs are generated from the name.
         </p>
       </div>
@@ -67,10 +67,10 @@ export default async function AdminCategoriesPage() {
               </tr>
             ) : (
               categories.map((cat) => (
-                <tr key={cat.id} className="hover:bg-gray-50/80">
-                  <td className="px-4 py-3 font-medium text-gray-900">{cat.name}</td>
-                  <td className="px-4 py-3 text-gray-600 font-mono text-xs">{cat.slug}</td>
-                  <td className="px-4 py-3 text-gray-600">{cat._count.products}</td>
+                <tr key={cat.id} className="hover:bg-[#fdf8f4]">
+                  <td className="px-4 py-3 font-medium text-[#1e140d]">{cat.name}</td>
+                  <td className="px-4 py-3 text-[#7c6652] font-mono text-xs">{cat.slug}</td>
+                  <td className="px-4 py-3 text-[#7c6652]">{cat._count.products}</td>
                   <td className="px-4 py-3">
                     <form
                       action={async (formData) => {
@@ -83,7 +83,7 @@ export default async function AdminCategoriesPage() {
                       <button
                         type="submit"
                         disabled={cat._count.products > 0}
-                        className="text-xs font-medium text-red-700 hover:text-red-900 disabled:opacity-40 disabled:cursor-not-allowed"
+                        className="text-xs font-medium text-[var(--admin-primary)] hover:opacity-70 disabled:opacity-30 disabled:cursor-not-allowed transition-opacity"
                       >
                         Delete
                       </button>

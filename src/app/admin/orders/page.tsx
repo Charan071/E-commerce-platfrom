@@ -91,14 +91,14 @@ export default async function AdminOrdersPage({ searchParams }: OrdersPageProps)
           <div className="flex flex-wrap gap-3">
             <button
               type="button"
-              className="inline-flex h-10 items-center gap-2 rounded-md border border-[#d9aaa9] px-4 text-sm font-medium text-[var(--admin-primary)] hover:bg-red-50"
+              className="inline-flex h-10 items-center gap-2 rounded-md border border-[#e5d8cc] px-4 text-sm font-medium text-[#6b5040] hover:bg-[#f5ede3] transition-colors"
             >
               <Download size={16} />
               Export
             </button>
             <button
               type="button"
-              className="inline-flex h-10 items-center gap-2 rounded-md bg-[var(--admin-primary)] px-4 text-sm font-medium text-white shadow-sm hover:opacity-90"
+              className="inline-flex h-10 items-center gap-2 rounded-md bg-[var(--admin-primary)] px-4 text-sm font-medium text-white shadow-sm hover:opacity-90 transition-opacity"
             >
               <Plus size={16} />
               Add Order
@@ -150,7 +150,7 @@ export default async function AdminOrdersPage({ searchParams }: OrdersPageProps)
 
           <button
             type="submit"
-            className="inline-flex h-10 items-center justify-center gap-2 rounded-md border border-[#d9aaa9] px-4 text-sm font-medium text-[var(--admin-primary)] hover:bg-red-50"
+            className="inline-flex h-10 items-center justify-center gap-2 rounded-md border border-[#e5d8cc] px-4 text-sm font-medium text-[#6b5040] hover:bg-[#f5ede3] transition-colors"
           >
             <Filter size={16} />
             Filters

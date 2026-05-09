@@ -58,7 +58,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           adminName={admin.name}
           brandName={brandKit.brandName}
         />
-        <main className="flex-1 overflow-y-auto p-4 sm:p-6">{children}</main>
+        <main className="flex-1 overflow-y-auto bg-[#f5f0ea] p-4 sm:p-6">{children}</main>
       </div>
     </div>
   );

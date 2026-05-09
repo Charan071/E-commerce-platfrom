@@ -4,8 +4,8 @@ export default function AdminCouponsPage() {
   return (
     <div className="space-y-6 max-w-2xl">
       <div>
-        <h2 className="text-xl font-semibold text-gray-900">Coupons &amp; discounts</h2>
-        <p className="text-sm text-gray-500 mt-1">
+        <h2 className="font-serif text-2xl text-[#1e140d]">Coupons &amp; discounts</h2>
+        <p className="text-sm text-[#7c6652] mt-1">
           Per-product sale pricing is live today via price, original price, and discount label fields on each
           product.
         </p>

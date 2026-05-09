@@ -7,8 +7,8 @@ export default function AdminGeneralSettingsPage() {
   return (
     <div className="space-y-6 max-w-2xl">
       <div>
-        <h2 className="text-xl font-semibold text-gray-900">General</h2>
-        <p className="text-sm text-gray-500 mt-1">
+        <h2 className="font-serif text-2xl text-[#1e140d]">General</h2>
+        <p className="text-sm text-[#7c6652] mt-1">
           Store identity and URLs. Brand colors and name are edited in Content Studio.
         </p>
       </div>

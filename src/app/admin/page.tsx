@@ -69,7 +69,7 @@ export default async function AdminDashboardPage() {
         <div className="rounded-lg border border-[#eadfd5] bg-white p-5 shadow-sm">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="font-serif text-2xl text-gray-950">Sales Overview</h2>
+              <h2 className="font-serif text-2xl text-[#1e140d]">Sales Overview</h2>
               <p className="mt-1 text-sm text-gray-500">Revenue across the last seven days</p>
             </div>
             <Link
@@ -99,7 +99,7 @@ export default async function AdminDashboardPage() {
 
         <div className="rounded-lg border border-[#eadfd5] bg-white p-5 shadow-sm">
           <div className="flex items-center justify-between">
-            <h2 className="font-serif text-2xl text-gray-950">Category Mix</h2>
+            <h2 className="font-serif text-2xl text-[#1e140d]">Category Mix</h2>
             <Link href="/admin/categories" className="text-sm font-medium text-[var(--admin-primary)]">
               Manage
             </Link>
@@ -129,7 +129,7 @@ export default async function AdminDashboardPage() {
       <section className="grid gap-5 xl:grid-cols-[1.2fr_0.9fr]">
         <div className="rounded-lg border border-[#eadfd5] bg-white shadow-sm">
           <div className="flex items-center justify-between border-b border-[#eadfd5] px-5 py-4">
-            <h2 className="font-serif text-2xl text-gray-950">Recent Orders</h2>
+            <h2 className="font-serif text-2xl text-[#1e140d]">Recent Orders</h2>
             <Link href="/admin/orders" className="text-sm font-medium text-[var(--admin-primary)]">
               View all
             </Link>
@@ -176,7 +176,7 @@ export default async function AdminDashboardPage() {
           <div className="flex items-center justify-between border-b border-[#eadfd5] px-5 py-4">
             <div className="flex items-center gap-2">
               <AlertTriangle size={20} className="text-orange-600" />
-              <h2 className="font-serif text-2xl text-gray-950">Stock Alerts</h2>
+              <h2 className="font-serif text-2xl text-[#1e140d]">Stock Alerts</h2>
             </div>
             <Link
               href="/admin/products?status=LOW_STOCK"

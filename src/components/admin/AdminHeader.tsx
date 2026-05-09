@@ -85,19 +85,23 @@ export function AdminHeader({ pendingOrdersCount, adminEmail, adminName, brandNa
   }
 
   return (
-    <header className="h-16 shrink-0 border-b border-gray-200 bg-white px-4 sm:px-6">
+    <header className="h-16 shrink-0 border-b border-[#e5d8cc] bg-[#faf7f4] px-4 sm:px-6">
       <div className="flex h-full items-center gap-4">
-        <button type="button" className="text-gray-500 hover:text-gray-700 lg:hidden" aria-label="Open menu">
+        <button
+          type="button"
+          className="text-[#a8927c] hover:text-[#6b5040] lg:hidden transition-colors"
+          aria-label="Open menu"
+        >
           <Menu size={20} />
         </button>
 
         <div className="min-w-0 flex-1">
-          <h1 className="text-lg font-semibold leading-none text-gray-950">{title}</h1>
-          <p className="mt-1 text-xs text-gray-400">
+          <h1 className="font-serif text-xl leading-none text-[#1e140d]">{title}</h1>
+          <p className="mt-0.5 text-xs text-[#a8927c]">
             {brandName}
             {breadcrumb && breadcrumb !== "Dashboard" && (
               <>
-                <span className="mx-1.5 text-gray-300">/</span>
+                <span className="mx-1.5 text-[#d4c4b4]">/</span>
                 {breadcrumb}
               </>
             )}
@@ -106,25 +110,25 @@ export function AdminHeader({ pendingOrdersCount, adminEmail, adminName, brandNa
 
         <form
           onSubmit={onSearch}
-          className="hidden w-64 items-center gap-2 rounded-lg border border-[#eadfd5] bg-white px-3 py-2 md:flex"
+          className="hidden w-64 items-center gap-2 rounded-lg border border-[#e5d8cc] bg-white px-3 py-2 md:flex focus-within:border-[var(--admin-primary)] transition-colors"
         >
-          <Search size={15} className="shrink-0 text-gray-500" aria-hidden />
+          <Search size={14} className="shrink-0 text-[#a8927c]" aria-hidden />
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             type="search"
             placeholder={getSearchPlaceholder(pathname)}
-            className="min-w-0 flex-1 bg-transparent text-sm text-gray-700 outline-none placeholder:text-gray-400"
+            className="min-w-0 flex-1 bg-transparent text-sm text-[#1e140d] outline-none placeholder:text-[#c4a88e]"
             aria-label="Admin search"
           />
         </form>
 
         <Link
           href="/admin/orders?status=PENDING"
-          className="relative hidden p-1.5 text-gray-500 hover:text-gray-700 sm:inline-flex"
+          className="relative hidden p-1.5 text-[#a8927c] hover:text-[var(--admin-primary)] sm:inline-flex transition-colors"
           aria-label={`Pending orders: ${pendingOrdersCount}`}
         >
-          <Bell size={20} />
+          <Bell size={18} />
           {pendingOrdersCount > 0 ? (
             <span
               className="absolute right-0.5 top-0.5 flex h-4 min-w-4 px-1 items-center justify-center rounded-full text-[9px] font-bold text-white"
@@ -137,15 +141,15 @@ export function AdminHeader({ pendingOrdersCount, adminEmail, adminName, brandNa
 
         <div className="flex items-center gap-2">
           <div
-            className="flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold text-white"
+            className="flex h-7 w-7 items-center justify-center rounded-full text-[11px] font-bold text-white"
             style={{ backgroundColor: "var(--admin-primary)" }}
           >
             {displayInitial}
           </div>
-          <span className="hidden text-sm font-medium text-gray-700 md:block max-w-[10rem] truncate">
+          <span className="hidden text-sm font-medium text-[#6b5040] md:block max-w-[9rem] truncate">
             {displayLabel}
           </span>
-          <ChevronDown size={16} className="hidden text-gray-400 md:block" aria-hidden />
+          <ChevronDown size={14} className="hidden text-[#a8927c] md:block" aria-hidden />
         </div>
       </div>
     </header>

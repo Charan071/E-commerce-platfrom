@@ -90,7 +90,7 @@ export default async function AdminProductsPage({ searchParams }: ProductsPagePr
           <div className="flex flex-wrap gap-3">
             <button
               type="button"
-              className="inline-flex h-10 items-center gap-2 rounded-md border border-[#d9aaa9] px-4 text-sm font-medium text-[var(--admin-primary)] hover:bg-red-50"
+              className="inline-flex h-10 items-center gap-2 rounded-md border border-[#e5d8cc] px-4 text-sm font-medium text-[#6b5040] hover:bg-[#f5ede3] transition-colors"
             >
               <UploadCloud size={16} />
               Import Products
@@ -164,7 +164,7 @@ export default async function AdminProductsPage({ searchParams }: ProductsPagePr
 
           <button
             type="submit"
-            className="inline-flex h-10 items-center justify-center gap-2 rounded-md border border-[#d9aaa9] px-4 text-sm font-medium text-[var(--admin-primary)] hover:bg-red-50"
+            className="inline-flex h-10 items-center justify-center gap-2 rounded-md border border-[#e5d8cc] px-4 text-sm font-medium text-[#6b5040] hover:bg-[#f5ede3] transition-colors"
           >
             <Filter size={16} />
             Filters
