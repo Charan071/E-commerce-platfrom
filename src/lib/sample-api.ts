@@ -1,6 +1,9 @@
 import { CATEGORIES, PRODUCTS, type Product } from "@/lib/mock-data";
 
 export function isExpectedSampleFallback(error: unknown) {
+  if (error instanceof Error) {
+    if (error.message === "DATABASE_URL is not configured") return true;
+  }
   if (!error || typeof error !== "object") return false;
 
   const code = (error as { code?: unknown }).code;

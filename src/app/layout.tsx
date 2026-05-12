@@ -11,7 +11,7 @@ import { getSiteUrl } from "@/lib/site";
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const playfair = Playfair_Display({ subsets: ["latin"], variable: "--font-playfair" });
 
-const siteUrl = getSiteUrl();
+const siteUrl = getSiteUrl() ?? new URL("http://localhost:3000");
 
 export const metadata: Metadata = {
   metadataBase: siteUrl,

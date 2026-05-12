@@ -68,21 +68,25 @@ function pickStringMetadata(metadata: unknown, keys: string[]) {
 }
 
 export async function getAuthContext(): Promise<AuthContext | null> {
-  const supabase = await createClient();
-  const { data, error } = await supabase.auth.getClaims();
+  try {
+    const supabase = await createClient();
+    const { data, error } = await supabase.auth.getClaims();
 
-  const userId = data?.claims?.sub;
-  if (error || !userId) return null;
+    const userId = data?.claims?.sub;
+    if (error || !userId) return null;
 
-  const claims = data.claims as AuthClaims;
+    const claims = data.claims as AuthClaims;
 
-  return {
-    userId,
-    email: claims.email,
-    name: pickStringMetadata(claims.user_metadata, ["full_name", "name"]),
-    isAdmin: claimsAreAdmin(claims),
-    hasMfa: claimsHaveMfa(claims),
-  };
+    return {
+      userId,
+      email: claims.email,
+      name: pickStringMetadata(claims.user_metadata, ["full_name", "name"]),
+      isAdmin: claimsAreAdmin(claims),
+      hasMfa: claimsHaveMfa(claims),
+    };
+  } catch {
+    return null;
+  }
 }
 
 export async function isAdminFromDatabase(userId: string) {
