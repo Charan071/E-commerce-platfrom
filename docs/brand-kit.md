@@ -1,5 +1,7 @@
 # AnavaSilks Brand Kit v2
 
+For a full route and environment inventory, see [Application specification](./spec.md).
+
 ## Brand Position
 
 - Niche: luxury Indian silk sarees.

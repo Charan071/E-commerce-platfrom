@@ -34,15 +34,8 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 
   return (
     <div
-      className="flex h-screen overflow-hidden"
-      style={
-        {
-          backgroundColor: brandKit.secondaryColor,
-          "--admin-primary": brandKit.primaryColor,
-          "--admin-accent": brandKit.accentColor,
-          "--admin-surface": brandKit.secondaryColor,
-        } as CSSProperties
-      }
+      className="flex h-screen overflow-hidden bg-white"
+      style={{ "--admin-primary": "#000000" } as CSSProperties}
     >
       <AdminSidebar
         pendingOrdersCount={pendingOrdersCount}
@@ -58,7 +51,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           adminName={admin.name}
           brandName={brandKit.brandName}
         />
-        <main className="flex-1 overflow-y-auto bg-[#f5f0ea] p-4 sm:p-6">{children}</main>
+        <main className="flex-1 overflow-y-auto bg-neutral-50 p-4 sm:p-6">{children}</main>
       </div>
     </div>
   );

@@ -110,12 +110,12 @@ export default function Navbar({ user, brandName, navPromos, navCategories }: Na
                 aria-label="Account"
                 className="hover:text-[var(--color-text)] transition-colors"
               >
-                <User className="w-[18px] h-[18px]" />
+                <User className="w-[18px] h-[18px]" strokeWidth={1.5} />
               </Link>
             )}
 
             <Link href="/cart" aria-label="Cart" className="relative hover:text-[var(--color-text)] transition-colors">
-              <ShoppingBag className="w-[18px] h-[18px]" />
+              <ShoppingBag className="w-[18px] h-[18px]" strokeWidth={1.5} />
               {cartCount > 0 && (
                 <span className="absolute -top-2 -right-2 bg-[var(--color-text)] text-[var(--color-surface)] text-[10px] font-medium px-1.5 py-0.5 rounded-full min-w-[1.25rem] text-center">
                   {cartCount}

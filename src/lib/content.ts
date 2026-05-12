@@ -123,21 +123,25 @@ export async function getBrandKitContent(): Promise<BrandKitContent> {
 }
 
 export async function getHeroContent(): Promise<HeroContent> {
+  const slides = await getHeroSlides();
+  return slides[0] ?? FALLBACK_HERO;
+}
+
+export async function getHeroSlides(): Promise<HeroContent[]> {
   try {
-    const item = await prisma.homeHero.findFirst({
+    const items = await prisma.homeHero.findMany({
       where: { isActive: true },
-      orderBy: { updatedAt: "desc" },
+      orderBy: { createdAt: "asc" },
     });
-    if (!item) return FALLBACK_HERO;
-    return {
+    return items.map((item) => ({
       title: item.title,
       subtitle: item.subtitle ?? "",
       ctaLabel: item.ctaLabel ?? "Shop Here",
       ctaHref: item.ctaHref ?? "/collections",
       imageUrl: item.imageUrl,
-    };
+    }));
   } catch {
-    return FALLBACK_HERO;
+    return [];
   }
 }
 
@@ -147,9 +151,6 @@ export async function getCollectionHighlights(): Promise<MediaBlock[]> {
       where: { isActive: true },
       orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
     });
-    if (items.length === 0) {
-      return FALLBACK_COLLECTION_HIGHLIGHTS.map((item, idx) => ({ ...item, id: `fallback-${idx}` }));
-    }
     return items.map((item) => ({
       id: item.id,
       title: item.title,
@@ -160,7 +161,7 @@ export async function getCollectionHighlights(): Promise<MediaBlock[]> {
       sortOrder: item.sortOrder,
     }));
   } catch {
-    return FALLBACK_COLLECTION_HIGHLIGHTS.map((item, idx) => ({ ...item, id: `fallback-${idx}` }));
+    return [];
   }
 }
 

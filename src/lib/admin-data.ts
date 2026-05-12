@@ -56,6 +56,12 @@ export type AdminDashboardData = {
     pendingOrders: number;
     activeProducts: number;
     customers: number;
+    /** Sum of order totals in the last 30 days */
+    revenueLast30Days: number;
+    ordersLast30Days: number;
+    customersLast30Days: number;
+    /** Delivered orders ÷ all orders (%) */
+    deliveredSharePct: number | null;
   };
   recentOrders: AdminOrderRow[];
   lowStockProducts: AdminProductRow[];
@@ -71,6 +77,7 @@ export type AdminOrdersData = {
     processing: number;
     shipped: number;
     delivered: number;
+    ordersLast30Days: number;
   };
   orders: AdminOrderRow[];
   pagination: { page: number; limit: number; total: number; totalPages: number };
@@ -84,6 +91,8 @@ export type AdminProductsData = {
     lowStock: number;
     outOfStock: number;
     totalValue: number;
+    productsCreatedLast30Days: number;
+    categoriesCreatedLast30Days: number;
   };
   products: AdminProductRow[];
   categories: { name: string; slug: string }[];
@@ -380,7 +389,11 @@ export async function getAdminOrders(params: SearchParamsInput): Promise<AdminOr
       ];
     }
 
-    const [orders, total, pending, processing, shipped, delivered] = await Promise.all([
+    const since30 = new Date();
+    since30.setDate(since30.getDate() - 30);
+    since30.setHours(0, 0, 0, 0);
+
+    const [orders, total, pending, processing, shipped, delivered, ordersLast30Days] = await Promise.all([
       prisma.order.findMany({
         where,
         skip,
@@ -397,10 +410,11 @@ export async function getAdminOrders(params: SearchParamsInput): Promise<AdminOr
       prisma.order.count({ where: { status: "PROCESSING" } }),
       prisma.order.count({ where: { status: "SHIPPED" } }),
       prisma.order.count({ where: { status: "DELIVERED" } }),
+      prisma.order.count({ where: { createdAt: { gte: since30 } } }),
     ]);
 
     return {
-      metrics: { total, pending, processing, shipped, delivered },
+      metrics: { total, pending, processing, shipped, delivered, ordersLast30Days },
       orders: orders.map(normalizeOrder),
       pagination: { page, limit, total, totalPages: Math.max(1, Math.ceil(total / limit)) },
       source: "database",
@@ -409,7 +423,7 @@ export async function getAdminOrders(params: SearchParamsInput): Promise<AdminOr
     console.error("[admin orders data]", error);
     const total = 356;
     return {
-      metrics: { total, pending: 28, processing: 42, shipped: 182, delivered: 104 },
+      metrics: { total, pending: 28, processing: 42, shipped: 182, delivered: 104, ordersLast30Days: 28 },
       orders: paginateSample(SAMPLE_ORDERS, page, limit),
       pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
       source: "sample",
@@ -444,7 +458,12 @@ export async function getAdminProducts(params: SearchParamsInput): Promise<Admin
     if (status === "LOW_STOCK") where.stock = { gt: 0, lte: 5 };
     if (status === "OUT_OF_STOCK") where.stock = 0;
 
-    const [products, total, allProducts, categories] = await Promise.all([
+    const since30 = new Date();
+    since30.setDate(since30.getDate() - 30);
+    since30.setHours(0, 0, 0, 0);
+
+    const [products, total, allProducts, categories, productsCreatedLast30Days, categoriesCreatedLast30Days] =
+      await Promise.all([
       prisma.product.findMany({
         where,
         skip,
@@ -464,6 +483,12 @@ export async function getAdminProducts(params: SearchParamsInput): Promise<Admin
         select: { name: true, slug: true },
         orderBy: { name: "asc" },
       }),
+      prisma.product.count({
+        where: { isActive: true, createdAt: { gte: since30 } },
+      }),
+      prisma.category.count({
+        where: { createdAt: { gte: since30 } },
+      }),
     ]);
 
     const totalValue = allProducts.reduce(
@@ -479,6 +504,8 @@ export async function getAdminProducts(params: SearchParamsInput): Promise<Admin
         lowStock: allProducts.filter((product) => product.stock > 0 && product.stock <= 5).length,
         outOfStock: allProducts.filter((product) => product.stock <= 0).length,
         totalValue,
+        productsCreatedLast30Days,
+        categoriesCreatedLast30Days,
       },
       products: products.map(normalizeProduct),
       categories,
@@ -502,6 +529,8 @@ export async function getAdminProducts(params: SearchParamsInput): Promise<Admin
         lowStock: 18,
         outOfStock: 7,
         totalValue: 1875450,
+        productsCreatedLast30Days: 0,
+        categoriesCreatedLast30Days: 0,
       },
       products: paginateSample(SAMPLE_PRODUCTS, page, limit),
       categories,
@@ -519,6 +548,10 @@ export async function getAdminDashboard(): Promise<AdminDashboardData> {
     start.setDate(today.getDate() - 6);
     start.setHours(0, 0, 0, 0);
 
+    const since30 = new Date(today);
+    since30.setDate(today.getDate() - 30);
+    since30.setHours(0, 0, 0, 0);
+
     const [
       revenue,
       orders,
@@ -529,6 +562,10 @@ export async function getAdminDashboard(): Promise<AdminDashboardData> {
       lowStockProducts,
       categoryBreakdown,
       salesOrders,
+      revenue30Agg,
+      customersLast30Days,
+      ordersLast30Days,
+      deliveredOrderCount,
     ] = await Promise.all([
       prisma.order.aggregate({ _sum: { total: true } }),
       prisma.order.count(),
@@ -562,9 +599,19 @@ export async function getAdminDashboard(): Promise<AdminDashboardData> {
         where: { createdAt: { gte: start } },
         select: { createdAt: true, total: true },
       }),
+      prisma.order.aggregate({
+        where: { createdAt: { gte: since30 } },
+        _sum: { total: true },
+      }),
+      prisma.user.count({ where: { createdAt: { gte: since30 } } }),
+      prisma.order.count({ where: { createdAt: { gte: since30 } } }),
+      prisma.order.count({ where: { status: "DELIVERED" } }),
     ]);
 
     const salesSeries = buildSalesSeries(start, salesOrders);
+    const revenueLast30Days = toNumber(revenue30Agg._sum.total);
+    const deliveredSharePct =
+      orders > 0 ? Math.round((deliveredOrderCount / orders) * 100) : null;
 
     return {
       metrics: {
@@ -573,6 +620,10 @@ export async function getAdminDashboard(): Promise<AdminDashboardData> {
         pendingOrders,
         activeProducts,
         customers,
+        revenueLast30Days,
+        ordersLast30Days,
+        customersLast30Days,
+        deliveredSharePct,
       },
       recentOrders: recentOrders.map(normalizeOrder),
       lowStockProducts: lowStockProducts.map(normalizeProduct),
@@ -592,6 +643,10 @@ export async function getAdminDashboard(): Promise<AdminDashboardData> {
         pendingOrders: 28,
         activeProducts: 248,
         customers: 1214,
+        revenueLast30Days: 0,
+        ordersLast30Days: 0,
+        customersLast30Days: 0,
+        deliveredSharePct: null,
       },
       recentOrders: SAMPLE_ORDERS.slice(0, 5),
       lowStockProducts: SAMPLE_PRODUCTS.filter((product) => product.stock <= 5).slice(0, 5),

@@ -1,6 +1,6 @@
 # Content Model (Admin-managed Storefront Blocks)
 
-This model makes homepage and nav media blocks editable from admin instead of being hardcoded.
+This model makes homepage and nav media blocks editable from admin instead of being hardcoded. See also [Application specification](./spec.md) for APIs and route inventory.
 
 ## 1) `BrandKit` (`brand_kit`)
 
@@ -29,9 +29,11 @@ Fields:
 - `imageUrl`, `imagePublicId`
 - `isActive`
 
+**Cardinality:** multiple rows are supported. The storefront loads **all active** heroes ordered by `createdAt` ascending and passes each row as a **slide** to `HeroCarousel` on `/`. A single row behaves as a one-slide hero.
+
 UI usage:
 
-- Top hero section on `/`
+- Top hero section on `/` (carousel with auto-advance when more than one slide)
 
 ## 3) `CollectionHighlight` (`collection_highlights`)
 
@@ -63,6 +65,20 @@ UI usage:
 
 - Right side visual cards in hover mega menu
 
+## 5) `NewsletterSubscription` (`newsletter_subscriptions`)
+
+Purpose: store marketing opt-ins captured from the storefront footer (and any other callers of the signup server action).
+
+Fields:
+
+- `email` (unique)
+- `source` (default `website`)
+- `createdAt`
+
+UI usage:
+
+- Admin list at `/admin/newsletter`
+
 ## Admin APIs
 
 - `GET/PUT /api/admin/content/brand-kit`
@@ -84,7 +100,7 @@ Sections:
 ## Frontend Consumption
 
 - `getBrandKitContent()` used in root layout — result injected as CSS vars on `<html>`.
-- `getHeroContent()` and `getCollectionHighlights()` used on homepage.
+- `getHeroSlides()` (or `getHeroContent()` for the first slide only) and `getCollectionHighlights()` used on homepage.
 - `getNavPromoBlocks()` used in navbar mega menu.
 - All readers include safe fallback content if tables are missing/unseeded.
 - Brand kit update triggers `revalidatePath` for `/`, `/shop`, and `/admin/content`.

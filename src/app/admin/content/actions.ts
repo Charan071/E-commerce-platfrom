@@ -46,33 +46,66 @@ export async function updateBrandKit(formData: FormData) {
   revalidatePath("/shop");
 }
 
-export async function upsertHero(formData: FormData) {
+export async function addHero(formData: FormData) {
   const admin = await requireAdmin();
   if (!admin) return;
 
-  const existing = await prisma.homeHero.findFirst({ orderBy: { createdAt: "asc" } });
-  const data = {
-    title: String(formData.get("title") ?? "Whisper of Summer"),
-    subtitle: String(formData.get("subtitle") ?? ""),
-    ctaLabel: String(formData.get("ctaLabel") ?? "Shop Here"),
-    ctaHref: String(formData.get("ctaHref") ?? "/collections"),
-    imageUrl: String(formData.get("imageUrl") ?? "/images/hero.png"),
-    imagePublicId: (formData.get("imagePublicId") as string) || null,
-    isActive: formData.get("isActive") === "on",
-  };
-
-  if (existing) {
-    await prisma.homeHero.update({ where: { id: existing.id }, data });
-  } else {
-    await prisma.homeHero.create({ data });
-  }
+  const item = await prisma.homeHero.create({
+    data: {
+      title: String(formData.get("title") ?? "New Banner"),
+      subtitle: String(formData.get("subtitle") ?? ""),
+      ctaLabel: String(formData.get("ctaLabel") ?? "Shop Here"),
+      ctaHref: String(formData.get("ctaHref") ?? "/shop"),
+      imageUrl: String(formData.get("imageUrl") ?? "/images/hero.png"),
+      imagePublicId: (formData.get("imagePublicId") as string) || null,
+      isActive: formData.get("isActive") === "on",
+    },
+  });
   await logAdminAudit({
     userId: admin.userId,
     email: admin.email,
-    action: "content.hero.upsert",
-    target: existing?.id ?? "home_hero",
+    action: "content.hero.create",
+    target: item.id,
   });
 
+  revalidatePath("/admin/content");
+  revalidatePath("/");
+}
+
+export async function updateHero(id: string, formData: FormData) {
+  const admin = await requireAdmin();
+  if (!admin) return;
+  await prisma.homeHero.update({
+    where: { id },
+    data: {
+      title: String(formData.get("title") ?? ""),
+      subtitle: String(formData.get("subtitle") ?? ""),
+      ctaLabel: String(formData.get("ctaLabel") ?? "Shop Here"),
+      ctaHref: String(formData.get("ctaHref") ?? "/shop"),
+      imageUrl: String(formData.get("imageUrl") ?? ""),
+      isActive: formData.get("isActive") === "on",
+    },
+  });
+  await logAdminAudit({
+    userId: admin.userId,
+    email: admin.email,
+    action: "content.hero.update",
+    target: id,
+  });
+  revalidatePath("/admin/content");
+  revalidatePath("/");
+}
+
+export async function deleteHero(id: string) {
+  const admin = await requireAdmin();
+  if (!admin) return;
+  await prisma.homeHero.delete({ where: { id } });
+  await logAdminAudit({
+    userId: admin.userId,
+    email: admin.email,
+    action: "content.hero.delete",
+    target: id,
+  });
   revalidatePath("/admin/content");
   revalidatePath("/");
 }

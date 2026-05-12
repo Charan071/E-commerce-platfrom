@@ -42,3 +42,17 @@ export async function uploadImage(
 export async function deleteImage(publicId: string): Promise<void> {
   await getCloudinary().uploader.destroy(publicId);
 }
+
+export async function listFolderImages(folder: string): Promise<UploadResult[]> {
+  const cld = getCloudinary();
+  const result = await cld.api.resources({
+    type: "upload",
+    prefix: folder,
+    max_results: 50,
+    resource_type: "image",
+  });
+  return (result.resources as { secure_url: string; public_id: string }[]).map((r) => ({
+    url: r.secure_url,
+    publicId: r.public_id,
+  }));
+}

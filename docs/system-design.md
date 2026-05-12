@@ -1,5 +1,7 @@
 # AnavaSilks System Design
 
+For route tables, environment variables, and a feature-level inventory of the current build, see [Application specification](./spec.md). This document focuses on architecture, flows, and design rationale.
+
 ## 1) Objectives
 
 - Deliver a premium silk e-commerce storefront with admin-managed content and catalog.
@@ -9,7 +11,7 @@
 
 ## 2) High-Level Architecture
 
-- **Frontend Runtime**: Next.js App Router (`src/app`) with server-first pages and client islands.
+- **Frontend Runtime**: Next.js 16 App Router (`src/app`) with React 19, server-first pages and client islands.
 - **Auth Provider**: Supabase Auth (email/password, recovery, callback verification).
 - **Data Access**: Prisma ORM on PostgreSQL (Supabase Postgres).
 - **Storage/CDN**: Cloudinary-ready image model fields (`url`, `publicId`) for catalog/content assets.
@@ -19,13 +21,13 @@
 
 ### 3.1 Storefront
 
-- Home, shop, product detail, cart, checkout, account routes.
-- Navbar + hero + highlights + promo blocks pull from DB-backed content models.
+- Home, shop, product detail, cart, checkout, account routes, and static marketing pages (`/about`, `/collections`, `/new-arrivals`).
+- Navbar + **hero carousel** (one slide per active `HomeHero` row) + highlights + promo blocks pull from DB-backed content models.
 - Fallback sample data is used only when expected DB tables are unavailable.
 
 ### 3.2 Admin Console
 
-- Dashboard, orders, inventory, categories, customers, reviews, content studio, newsletter.
+- Dashboard, orders, inventory, categories, customers, reviews, content studio, newsletter, payments/general settings, plus informational pages for banners, coupons, shipping, and taxes (see spec for sidebar vs direct URL).
 - Content Studio manages:
   - `BrandKit`
   - `HomeHero`
@@ -49,6 +51,8 @@
 - **ProductImage/ProductColor**: media and variation attributes.
 - **Order/OrderItem**: order snapshots and line items.
 - **BrandKit/HomeHero/CollectionHighlight/NavPromoBlock**: managed content for shell/pages.
+- **NewsletterSubscription**: footer / marketing signups.
+- **WishlistItem**: authenticated wishlist rows; storefront syncs via `/api/wishlist`.
 - **AdminAuditLog**: admin action event log for mutating operations.
 
 ## 5) Request/Action Flows
@@ -64,14 +68,20 @@
   2. Callback verifies recovery token.
   3. User lands on reset-password page and updates password.
 
-### 5.2 Admin Guard
+### 5.2 Edge middleware (session gate)
+
+- `src/middleware.ts` uses `@supabase/ssr` to refresh the session cookie on matching routes.
+- Paths under `/admin` (or hostnames starting with `admin.`) require an authenticated Supabase user; unauthenticated requests redirect to `/login` with `redirectTo`. **Admin role is not evaluated in middleware** — the admin layout’s `requireAdmin()` is the authority for role and optional MFA.
+- Authenticated users hitting `/login`, `/signup`, `/forgot-password`, or `/auth/*` are redirected to `/`.
+- `admin.example` style hosts redirect `/` → `/admin`.
+
+### 5.3 Admin Guard
 
 - `src/app/admin/layout.tsx` enforces `requireAdmin()` server-side for every admin page render.
-- No session → redirect to `/login`.
-- Session without admin role → redirect to `/?admin=forbidden`.
+- Unauthenticated visitors are usually redirected to `/login` by **middleware** before the layout runs; if `requireAdmin()` still fails (no admin role in JWT or DB, optional MFA not satisfied, etc.), the layout redirects to `/?admin=forbidden`.
 - Admin role resolution checks JWT `app_metadata` first, then DB `User.role = ADMIN` as fallback.
 
-### 5.3 Inventory CRUD
+### 5.4 Inventory CRUD
 
 - List/filter via admin data layer.
 - Mutations via server actions:
@@ -82,7 +92,7 @@
 
 ## 6) Theming & Brand Kit Strategy
 
-Brand kit is the single source of truth for storefront and admin shell visual identity.
+Brand kit is the single source of truth for **storefront** visual identity (CSS variables on `<html>`). The admin console uses a separate fixed chrome; see §6.2.
 
 ### 6.1 CSS Variable Injection
 
@@ -101,13 +111,9 @@ Brand tokens are loaded from the DB (or fallback constants) in `src/app/layout.t
 
 `globals.css` `@theme` holds the same values as static fallbacks for Tailwind utility generation and pre-hydration rendering.
 
-### 6.2 Admin Shell Variables
+### 6.2 Admin shell styling
 
-`src/app/admin/layout.tsx` additionally injects admin-scoped tokens on the root admin div:
-
-- `--admin-primary` → `primaryColor`
-- `--admin-accent` → `accentColor`
-- `--admin-surface` → `secondaryColor` (warm-white admin background)
+The admin layout currently uses a **fixed neutral / black chrome** for the sidebar header and accents (for example `--admin-primary` is set to a fixed value on the admin root for legacy utility references). **Brand kit** values are still loaded for **sidebar branding copy** (`brandName`, `tagline`) and header context, not as the primary driver of admin CSS variables.
 
 ### 6.3 Font Loading
 
@@ -215,7 +221,7 @@ flowchart TD
 ### 12.1 Storefront Features
 
 - Brand-kit driven shell with 5 admin-managed color tokens + nav letter-spacing token.
-- Hero section managed from admin.
+- Hero **carousel** managed from admin (one slide per active `HomeHero` row).
 - Featured collection cards managed from admin.
 - Per-card embedded-text toggle:
   - `imageHasEmbeddedText = true` hides overlay title/subtitle on that card.
@@ -223,7 +229,7 @@ flowchart TD
 - Shop mega menu with hover intent and promo cards.
 - Product rail and product cards with discount badges, price strike-through, wishlist button.
 - Account area: profile, addresses, orders, wishlist.
-- Newsletter signup capture.
+- `robots.txt` / `sitemap.xml` via App Router metadata routes when `NEXT_PUBLIC_SITE_URL` (or Vercel URL) is set.
 
 ### 12.2 Authentication Features
 
@@ -250,7 +256,7 @@ flowchart TD
   - Nav promo CRUD
   - Embedded-text checkbox for image cards
 - Newsletter subscribers list.
-- Settings pages for environment visibility and general store references.
+- Settings pages: payments, general, plus informational shipping/taxes pages (not all linked from the primary sidebar).
 
 ### 12.4 Security and Governance
 
@@ -262,6 +268,6 @@ flowchart TD
 ### 12.5 Developer Experience / Operations
 
 - Prisma migrations for schema changes and content/security models.
-- Build-safe Prisma initialization path.
+- Prisma 7 with `@prisma/adapter-pg` and `DATABASE_URL`; build-safe lazy client via `src/lib/prisma.ts`.
 - Expected sample fallback handling for missing DB tables in non-ready states.
-- Lint/build verification workflow for iterative changes.
+- Vitest unit tests (`npm run test`) and lint/build verification for iterative changes.

@@ -4,6 +4,9 @@ import { revalidatePath } from "next/cache";
 import { requireAdmin } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { slugify } from "@/lib/sample-api";
+import { ensureUniqueProductSlug } from "@/lib/product-slug";
+import { listFolderImages } from "@/lib/cloudinary";
+import type { UploadResult } from "@/lib/cloudinary";
 
 function toText(value: FormDataEntryValue | null) {
   return typeof value === "string" ? value.trim() : "";
@@ -12,23 +15,6 @@ function toText(value: FormDataEntryValue | null) {
 function toNumber(value: FormDataEntryValue | null, fallback = 0) {
   const num = Number(value);
   return Number.isFinite(num) ? num : fallback;
-}
-
-async function ensureUniqueSlug(baseSlug: string, excludeId?: string) {
-  let slug = baseSlug;
-  let count = 1;
-  while (true) {
-    const existing = await prisma.product.findFirst({
-      where: {
-        slug,
-        ...(excludeId ? { id: { not: excludeId } } : {}),
-      },
-      select: { id: true },
-    });
-    if (!existing) return slug;
-    count += 1;
-    slug = `${baseSlug}-${count}`;
-  }
 }
 
 async function resolveCategoryId(categoryIdRaw: string, newCategoryNameRaw: string) {
@@ -93,11 +79,13 @@ export async function createProduct(formData: FormData) {
   const categoryId = await resolveCategoryId(categoryIdRaw, newCategoryName);
   if (!title || !description || !material || !categoryId || !slugInput) return;
 
-  const slug = await ensureUniqueSlug(slugInput);
+  const slug = await ensureUniqueProductSlug(slugInput);
   const price = toNumber(formData.get("price"));
   const originalPriceRaw = toText(formData.get("originalPrice"));
   const originalPrice = originalPriceRaw ? Number(originalPriceRaw) : null;
   const stock = toNumber(formData.get("stock"));
+  const sizesRaw = toText(formData.get("sizes"));
+  const sizes = sizesRaw ? sizesRaw.split(",").map((s) => s.trim()).filter(Boolean) : [];
   const imageRows = parseImageRows(formData, slug);
 
   await prisma.product.create({
@@ -109,6 +97,7 @@ export async function createProduct(formData: FormData) {
       originalPrice: Number.isFinite(originalPrice as number) ? originalPrice : null,
       discount: toText(formData.get("discount")) || null,
       material,
+      sizes,
       stock,
       isNew: formData.get("isNew") === "on",
       isActive: true,
@@ -137,11 +126,13 @@ export async function updateProduct(productId: string, formData: FormData) {
   const categoryId = await resolveCategoryId(categoryIdRaw, newCategoryName);
   if (!title || !description || !material || !categoryId || !slugInput) return;
 
-  const slug = await ensureUniqueSlug(slugInput, productId);
+  const slug = await ensureUniqueProductSlug(slugInput, productId);
   const price = toNumber(formData.get("price"));
   const originalPriceRaw = toText(formData.get("originalPrice"));
   const originalPrice = originalPriceRaw ? Number(originalPriceRaw) : null;
   const stock = toNumber(formData.get("stock"));
+  const sizesRaw = toText(formData.get("sizes"));
+  const sizes = sizesRaw ? sizesRaw.split(",").map((s) => s.trim()).filter(Boolean) : [];
   const imageRows = parseImageRows(formData, slug);
 
   await prisma.product.update({
@@ -154,6 +145,7 @@ export async function updateProduct(productId: string, formData: FormData) {
       originalPrice: Number.isFinite(originalPrice as number) ? originalPrice : null,
       discount: toText(formData.get("discount")) || null,
       material,
+      sizes,
       stock,
       isNew: formData.get("isNew") === "on",
       categoryId,
@@ -184,4 +176,21 @@ export async function deleteProduct(productId: string) {
 
   revalidatePath("/admin/products");
   revalidatePath("/shop");
+}
+
+export async function fetchCloudinaryFolder(input: string): Promise<UploadResult[]> {
+  const admin = await requireAdmin();
+  if (!admin) return [];
+
+  let folder = input.trim();
+
+  // Extract folder path from a full Cloudinary delivery URL
+  if (folder.includes("cloudinary.com")) {
+    const match = folder.match(/\/upload\/(?:v\d+\/)?(.+?)(?:\/[^/]+\.[a-z]{2,5})?[/?]?$/);
+    folder = match?.[1]?.replace(/\/$/, "") ?? folder;
+  } else {
+    folder = folder.replace(/\/$/, "");
+  }
+
+  return listFolderImages(folder);
 }

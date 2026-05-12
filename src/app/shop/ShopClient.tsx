@@ -3,10 +3,9 @@
 import { useCallback, useMemo, useState, useTransition } from "react";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { ChevronDown, ChevronRight, Filter } from "lucide-react";
+import { ChevronRight, ChevronUp, SlidersHorizontal, X } from "lucide-react";
 import type { Product } from "@/lib/mock-data";
 import { ProductCard } from "@/components/ui/ProductCard";
-import { Button } from "@/components/ui/Button";
 import {
   applyShopFiltersAndSort,
   parseShopSortParam,
@@ -20,12 +19,16 @@ type ShopClientProps = {
   wishlistedProductIds: string[];
 };
 
-function readFabricList(raw: string | null) {
+const SORT_OPTIONS: { value: ShopSortOption; label: string }[] = [
+  { value: "featured", label: "Featured" },
+  { value: "newest", label: "Newest first" },
+  { value: "price-asc", label: "Price, low to high" },
+  { value: "price-desc", label: "Price, high to low" },
+];
+
+function readList(raw: string | null) {
   if (!raw?.trim()) return [];
-  return raw
-    .split(",")
-    .map((s) => s.trim())
-    .filter(Boolean);
+  return raw.split(",").map((s) => s.trim()).filter(Boolean);
 }
 
 export function ShopClient({ products, categories, fabrics, wishlistedProductIds }: ShopClientProps) {
@@ -33,7 +36,8 @@ export function ShopClient({ products, categories, fabrics, wishlistedProductIds
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
-  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [sortOpen, setSortOpen] = useState(false);
   const wishSet = useMemo(() => new Set(wishlistedProductIds), [wishlistedProductIds]);
 
   const query = searchParams.get("q") ?? "";
@@ -41,7 +45,7 @@ export function ShopClient({ products, categories, fabrics, wishlistedProductIds
   const selectedCategory =
     categoryParam && categories.includes(categoryParam) ? categoryParam : "All Sarees";
   const sort: ShopSortOption = parseShopSortParam(searchParams.get("sort"));
-  const selectedFabrics = readFabricList(searchParams.get("fabric"));
+  const selectedFabrics = readList(searchParams.get("fabric"));
 
   const updateQuery = useCallback(
     (updates: Record<string, string | null>) => {
@@ -72,164 +76,268 @@ export function ShopClient({ products, categories, fabrics, wishlistedProductIds
     const set = new Set(selectedFabrics);
     if (set.has(fabric)) set.delete(fabric);
     else set.add(fabric);
-    const value = Array.from(set).join(",");
-    updateQuery({ fabric: value || null });
+    updateQuery({ fabric: Array.from(set).join(",") || null });
   }
 
+  const activeFilterCount =
+    (selectedCategory !== "All Sarees" ? 1 : 0) + selectedFabrics.length + (query ? 1 : 0);
+
+  const currentSortLabel = SORT_OPTIONS.find((o) => o.value === sort)?.label ?? "Featured";
+
   return (
-    <div className="bg-background min-h-screen pb-20">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 text-sm text-text-muted flex items-center gap-2 border-b border-gray-200">
-        <Link href="/" className="hover:text-[var(--color-text)] transition-colors">
-          Home
-        </Link>
+    <div className="bg-[var(--color-background)] min-h-screen">
+      {/* Breadcrumb */}
+      <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-10 py-3 text-xs text-neutral-500 flex items-center gap-2 border-b border-neutral-200">
+        <Link href="/" className="hover:text-[var(--color-text)] transition-colors">Home</Link>
         <ChevronRight className="w-3 h-3" />
-        <span className="text-text">Shop</span>
-        {query ? (
+        <span className="text-[var(--color-text)]">Shop</span>
+        {query && (
           <>
             <ChevronRight className="w-3 h-3" />
-            <span className="text-text truncate max-w-[12rem]">&ldquo;{query}&rdquo;</span>
+            <span className="truncate max-w-[12rem]">&ldquo;{query}&rdquo;</span>
           </>
-        ) : null}
+        )}
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex flex-col md:flex-row gap-8 items-start">
-          <div className="md:hidden w-full flex justify-between items-center mb-4">
-            <h1 className="text-2xl font-serif">All Products</h1>
-            <Button variant="outline" size="sm" onClick={() => setMobileFiltersOpen(!mobileFiltersOpen)}>
-              <Filter className="w-4 h-4 mr-2" />
-              Filters
-            </Button>
+      {/* Page title */}
+      <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-10 py-7">
+        <h1 className="font-serif text-3xl text-[var(--color-text)]">
+          {selectedCategory !== "All Sarees" ? selectedCategory : "All Sarees"}
+        </h1>
+      </div>
+
+      {/* Filter + Sort bar */}
+      <div className="sticky top-[80px] z-30 bg-[var(--color-background)] border-y border-neutral-200">
+        <div className="max-w-screen-2xl mx-auto flex items-stretch h-12">
+          {/* FILTERS */}
+          <button
+            type="button"
+            onClick={() => setDrawerOpen(true)}
+            className="flex items-center gap-2.5 px-6 text-[11px] tracking-[0.2em] uppercase font-medium border-r border-neutral-200 hover:bg-neutral-50 transition-colors shrink-0"
+          >
+            <SlidersHorizontal size={13} strokeWidth={1.5} />
+            FILTERS
+            {activeFilterCount > 0 && (
+              <span className="flex h-4 w-4 items-center justify-center rounded-full bg-[var(--color-text)] text-[var(--color-background)] text-[9px] font-bold">
+                {activeFilterCount}
+              </span>
+            )}
+          </button>
+
+          {/* Center count */}
+          <div className="flex-1 flex items-center justify-center text-xs text-neutral-400">
+            <span className={isPending ? "opacity-0" : ""}>
+              {filteredProducts.length} products
+            </span>
           </div>
 
-          <aside
-            className={`w-full md:w-64 flex-shrink-0 ${mobileFiltersOpen ? "block" : "hidden md:block"}`}
-          >
-            <div className="bg-white p-6 rounded-sm shadow-sm sticky top-24 border border-neutral-100">
-              <h2 className="text-sm font-medium uppercase tracking-[0.18em] text-text mb-6">Filter By</h2>
+          {/* SORT BY */}
+          <div className="border-l border-neutral-200 relative shrink-0">
+            <button
+              type="button"
+              onClick={() => setSortOpen((v) => !v)}
+              className="flex items-center gap-2 h-full px-6 text-[11px] tracking-[0.2em] uppercase font-medium hover:bg-neutral-50 transition-colors"
+            >
+              SORT BY
+              <ChevronUp
+                size={11}
+                strokeWidth={1.5}
+                className={`transition-transform duration-200 ${sortOpen ? "" : "rotate-180"}`}
+              />
+            </button>
 
-              <div className="mb-8">
-                <div className="flex justify-between items-center mb-4">
-                  <h3 className="font-medium text-sm text-text">Categories</h3>
-                  <ChevronDown className="w-4 h-4 text-text-muted" aria-hidden />
-                </div>
-                <div className="space-y-3">
-                  {categories.map((category) => (
-                    <label key={category} className="flex items-center gap-3 cursor-pointer group">
-                      <input
-                        type="radio"
-                        name="category"
-                        checked={selectedCategory === category}
-                        onChange={() =>
-                          updateQuery({
-                            category: category === "All Sarees" ? null : category,
-                          })
-                        }
-                        className="w-4 h-4 text-[var(--color-text)] bg-gray-100 border-gray-300 focus:ring-[var(--color-accent)]"
-                      />
-                      <span
-                        className={`text-sm group-hover:text-[var(--color-text)] transition-colors ${
-                          selectedCategory === category ? "text-[var(--color-text)] font-medium" : "text-text-muted"
-                        }`}
-                      >
-                        {category}
-                      </span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-
-              <div className="mb-8 pt-6 border-t border-gray-100">
-                <div className="flex justify-between items-center mb-4">
-                  <h3 className="font-medium text-sm text-text">Fabric</h3>
-                  <ChevronDown className="w-4 h-4 text-text-muted" aria-hidden />
-                </div>
-                <div className="space-y-3">
-                  {fabrics.map((fabric) => (
-                    <label key={fabric} className="flex items-center gap-3 cursor-pointer group">
-                      <input
-                        type="checkbox"
-                        checked={selectedFabrics.includes(fabric)}
-                        onChange={() => toggleFabric(fabric)}
-                        className="w-4 h-4 rounded-sm text-[var(--color-text)] bg-gray-100 border-gray-300 focus:ring-[var(--color-accent)]"
-                      />
-                      <span className="text-sm text-text-muted group-hover:text-[var(--color-text)] transition-colors">
-                        {fabric}
-                      </span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-
-              <Button
-                fullWidth
-                className="mt-4"
-                onClick={() => {
-                  updateQuery({ category: null, fabric: null, q: null, sort: null });
-                  setMobileFiltersOpen(false);
-                }}
-              >
-                Reset Filters
-              </Button>
-            </div>
-          </aside>
-
-          <div className="flex-grow w-full min-w-0">
-            <div className="hidden md:flex justify-between items-end mb-8">
-              <div>
-                <h1 className="text-4xl font-serif text-text mb-2">Shop All Products</h1>
-                <p className="text-text-muted text-sm">
-                  Discover our complete collection — refine by category, fabric, or search.
-                </p>
-              </div>
-            </div>
-
-            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-6 text-sm text-text-muted">
-              <span className={isPending ? "opacity-70" : ""}>
-                Showing {filteredProducts.length} of {products.length} products
-              </span>
-              <div className="flex items-center gap-2 bg-white px-3 py-2 border border-gray-200 rounded-sm">
-                <label htmlFor="shop-sort" className="shrink-0">
-                  Sort by:
-                </label>
-                <select
-                  id="shop-sort"
-                  value={sort}
-                  onChange={(e) =>
-                    updateQuery({
-                      sort: e.target.value === "featured" ? null : e.target.value,
-                    })
-                  }
-                  className="bg-transparent font-medium text-text outline-none cursor-pointer min-w-[10rem]"
-                >
-                  <option value="featured">Featured</option>
-                  <option value="newest">Newest first</option>
-                  <option value="price-asc">Price: Low to High</option>
-                  <option value="price-desc">Price: High to Low</option>
-                </select>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-              {filteredProducts.map((product) => (
-                <ProductCard
-                  key={product.id}
-                  product={product}
-                  initiallyWishlisted={wishSet.has(product.id)}
+            {sortOpen && (
+              <>
+                <div
+                  className="fixed inset-0 z-30"
+                  onClick={() => setSortOpen(false)}
                 />
-              ))}
-            </div>
-
-            {filteredProducts.length === 0 && (
-              <div className="rounded-sm border border-dashed border-gray-300 bg-white py-14 text-center px-4">
-                <h2 className="font-serif text-2xl text-text">No products match</h2>
-                <p className="mt-2 text-sm text-text-muted">Try another search or reset filters.</p>
-                <Button className="mt-6" onClick={() => updateQuery({ category: null, fabric: null, q: null })}>
-                  Clear filters
-                </Button>
-              </div>
+                <div className="absolute right-0 top-full w-52 bg-white border border-neutral-200 z-40 py-1 shadow-sm">
+                  {SORT_OPTIONS.map((opt) => (
+                    <button
+                      key={opt.value}
+                      type="button"
+                      onClick={() => {
+                        updateQuery({ sort: opt.value === "featured" ? null : opt.value });
+                        setSortOpen(false);
+                      }}
+                      className={`block w-full text-left px-5 py-2.5 text-sm transition-colors ${
+                        sort === opt.value
+                          ? "text-[var(--color-text)] font-medium"
+                          : "text-neutral-500 hover:text-[var(--color-text)] hover:bg-neutral-50"
+                      }`}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+              </>
             )}
           </div>
+        </div>
+      </div>
+
+      {/* Product grid */}
+      <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-10 py-8">
+        {filteredProducts.length > 0 ? (
+          <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-x-5 gap-y-10">
+            {filteredProducts.map((product) => (
+              <ProductCard
+                key={product.id}
+                product={product}
+                initiallyWishlisted={wishSet.has(product.id)}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="py-24 text-center">
+            <h2 className="font-serif text-2xl text-[var(--color-text)]">No products found</h2>
+            <p className="mt-2 text-sm text-neutral-500">Try adjusting your filters.</p>
+            <button
+              type="button"
+              onClick={() => updateQuery({ category: null, fabric: null, q: null })}
+              className="mt-6 inline-flex items-center gap-2 text-xs tracking-[0.2em] uppercase font-medium text-[var(--color-text)] border border-[var(--color-text)] px-5 py-2.5 hover:bg-[var(--color-text)] hover:text-[var(--color-background)] transition-colors"
+            >
+              Clear all filters
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* Filter drawer backdrop */}
+      <div
+        className={`fixed inset-0 bg-black/25 z-40 transition-opacity duration-300 ${
+          drawerOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+        }`}
+        onClick={() => setDrawerOpen(false)}
+      />
+
+      {/* Filter drawer panel */}
+      <div
+        className={`fixed left-0 top-0 h-full w-80 bg-white z-50 flex flex-col transition-transform duration-300 ease-out ${
+          drawerOpen ? "translate-x-0" : "-translate-x-full"
+        }`}
+      >
+        {/* Drawer header */}
+        <div className="flex items-center justify-between px-6 py-5 border-b border-neutral-200 shrink-0">
+          <h2 className="text-[11px] tracking-[0.2em] uppercase font-semibold text-[var(--color-text)]">
+            FILTERS
+          </h2>
+          <button
+            type="button"
+            onClick={() => setDrawerOpen(false)}
+            aria-label="Close filters"
+            className="text-neutral-500 hover:text-[var(--color-text)] transition-colors"
+          >
+            <X size={18} strokeWidth={1.5} />
+          </button>
+        </div>
+
+        {/* Drawer body — scrollable */}
+        <div className="flex-1 overflow-y-auto px-6 py-5 space-y-7">
+          {/* Categories */}
+          <div>
+            <h3 className="text-[10px] tracking-[0.22em] uppercase font-semibold text-neutral-400 mb-4">
+              Product type
+            </h3>
+            <div className="space-y-3">
+              {categories.map((cat) => (
+                <label key={cat} className="flex items-center gap-3 cursor-pointer group">
+                  <span
+                    className={`h-4 w-4 shrink-0 border rounded-sm flex items-center justify-center transition-colors ${
+                      selectedCategory === cat
+                        ? "border-[var(--color-text)] bg-[var(--color-text)]"
+                        : "border-neutral-300 group-hover:border-[var(--color-text)]"
+                    }`}
+                    onClick={() =>
+                      updateQuery({
+                        category: selectedCategory === cat || cat === "All Sarees" ? null : cat,
+                      })
+                    }
+                  >
+                    {selectedCategory === cat && (
+                      <svg viewBox="0 0 10 8" className="w-2.5 h-2.5 fill-white">
+                        <path d="M1 4l3 3 5-6" stroke="white" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    )}
+                  </span>
+                  <span
+                    className={`text-sm transition-colors ${
+                      selectedCategory === cat
+                        ? "text-[var(--color-text)] font-medium"
+                        : "text-neutral-600 group-hover:text-[var(--color-text)]"
+                    }`}
+                    onClick={() =>
+                      updateQuery({
+                        category: selectedCategory === cat || cat === "All Sarees" ? null : cat,
+                      })
+                    }
+                  >
+                    {cat}
+                  </span>
+                </label>
+              ))}
+            </div>
+          </div>
+
+          {/* Fabric */}
+          <div className="border-t border-neutral-100 pt-6">
+            <h3 className="text-[10px] tracking-[0.22em] uppercase font-semibold text-neutral-400 mb-4">
+              Fabric
+            </h3>
+            <div className="space-y-3">
+              {fabrics.map((fabric) => (
+                <label key={fabric} className="flex items-center gap-3 cursor-pointer group">
+                  <span
+                    className={`h-4 w-4 shrink-0 border rounded-sm flex items-center justify-center transition-colors ${
+                      selectedFabrics.includes(fabric)
+                        ? "border-[var(--color-text)] bg-[var(--color-text)]"
+                        : "border-neutral-300 group-hover:border-[var(--color-text)]"
+                    }`}
+                    onClick={() => toggleFabric(fabric)}
+                  >
+                    {selectedFabrics.includes(fabric) && (
+                      <svg viewBox="0 0 10 8" className="w-2.5 h-2.5">
+                        <path d="M1 4l3 3 5-6" stroke="white" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    )}
+                  </span>
+                  <span
+                    className={`text-sm transition-colors ${
+                      selectedFabrics.includes(fabric)
+                        ? "text-[var(--color-text)] font-medium"
+                        : "text-neutral-600 group-hover:text-[var(--color-text)]"
+                    }`}
+                    onClick={() => toggleFabric(fabric)}
+                  >
+                    {fabric}
+                  </span>
+                </label>
+              ))}
+            </div>
+          </div>
+
+          {/* Reset */}
+          {activeFilterCount > 0 && (
+            <button
+              type="button"
+              onClick={() => updateQuery({ category: null, fabric: null, q: null })}
+              className="text-xs tracking-[0.18em] uppercase text-neutral-400 hover:text-[var(--color-text)] transition-colors"
+            >
+              Clear all filters
+            </button>
+          )}
+        </div>
+
+        {/* Sticky footer */}
+        <div className="shrink-0 border-t border-neutral-200 px-6 py-4">
+          <button
+            type="button"
+            onClick={() => setDrawerOpen(false)}
+            className="w-full bg-[var(--color-text)] text-[var(--color-background)] text-[11px] tracking-[0.2em] uppercase font-semibold py-3.5 hover:opacity-90 transition-opacity"
+          >
+            VIEW {filteredProducts.length} ITEMS
+          </button>
         </div>
       </div>
     </div>

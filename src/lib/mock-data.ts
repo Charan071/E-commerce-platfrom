@@ -6,9 +6,11 @@ export interface Product {
   originalPrice?: number;
   material: string;
   color: { name: string; hex: string }[];
+  sizes?: string[];
   category: string;
   image: string;
   hoverImage?: string;
+  allImages?: string[];
   isNew?: boolean;
   discount?: string;
   stock: number;
@@ -44,6 +46,7 @@ export const PRODUCTS: Product[] = [
       { name: "Red", hex: "#8b0000" },
       { name: "Gold", hex: "#d4af37" }
     ],
+    sizes: ["34", "36", "38", "40", "42"],
     category: "Kanchipuram Silk",
     image: "/images/saree-1.png",
     isNew: true,
@@ -75,6 +78,7 @@ export const PRODUCTS: Product[] = [
       { name: "Pink", hex: "#ffc0cb" },
       { name: "Magenta", hex: "#8b008b" }
     ],
+    sizes: ["34", "36", "38", "40", "42", "44"],
     category: "Kanchipuram Silk",
     image: "/images/saree-3.png",
     stock: 3
@@ -135,6 +139,7 @@ export const PRODUCTS: Product[] = [
       { name: "Orange", hex: "#ffa500" },
       { name: "Green", hex: "#008000" }
     ],
+    sizes: ["34", "36", "38", "40", "42"],
     category: "Kanchipuram Silk",
     image: "/images/saree-3.png",
     stock: 6

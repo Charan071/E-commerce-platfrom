@@ -1,20 +1,20 @@
 import { clsx } from "clsx";
 
 const styles: Record<string, string> = {
-  PENDING: "border-amber-200 bg-amber-50 text-amber-700",
-  CONFIRMED: "border-blue-200 bg-blue-50 text-blue-700",
-  PROCESSING: "border-blue-200 bg-blue-50 text-blue-700",
-  SHIPPED: "border-purple-200 bg-purple-50 text-purple-700",
-  DELIVERED: "border-green-200 bg-green-50 text-green-700",
-  CANCELLED: "border-red-200 bg-red-50 text-red-700",
-  REFUNDED: "border-gray-200 bg-gray-100 text-gray-700",
-  UNPAID: "border-amber-200 bg-amber-50 text-amber-700",
-  PAID: "border-green-200 bg-green-50 text-green-700",
-  PARTIALLY_REFUNDED: "border-purple-200 bg-purple-50 text-purple-700",
-  FAILED: "border-red-200 bg-red-50 text-red-700",
-  IN_STOCK: "border-green-200 bg-green-50 text-green-700",
-  LOW_STOCK: "border-orange-200 bg-orange-50 text-orange-700",
-  OUT_OF_STOCK: "border-red-200 bg-red-50 text-red-700",
+  DELIVERED:           "bg-black text-white border-black",
+  PAID:                "bg-black text-white border-black",
+  IN_STOCK:            "bg-black text-white border-black",
+  PENDING:             "bg-white text-neutral-700 border-neutral-300",
+  CONFIRMED:           "bg-white text-neutral-700 border-neutral-300",
+  PROCESSING:          "bg-white text-neutral-700 border-neutral-300",
+  SHIPPED:             "bg-white text-neutral-700 border-neutral-300",
+  UNPAID:              "bg-white text-neutral-700 border-neutral-300",
+  LOW_STOCK:           "bg-white text-neutral-700 border-neutral-300",
+  CANCELLED:           "bg-neutral-100 text-neutral-400 border-neutral-200",
+  REFUNDED:            "bg-neutral-100 text-neutral-400 border-neutral-200",
+  PARTIALLY_REFUNDED:  "bg-neutral-100 text-neutral-400 border-neutral-200",
+  FAILED:              "bg-neutral-100 text-neutral-400 border-neutral-200",
+  OUT_OF_STOCK:        "bg-neutral-100 text-neutral-400 border-neutral-200",
 };
 
 function humanize(value: string) {
@@ -28,8 +28,8 @@ export function AdminStatusBadge({ value }: { value: string }) {
   return (
     <span
       className={clsx(
-        "inline-flex min-w-[76px] items-center justify-center rounded-md border px-2.5 py-1 text-xs font-medium",
-        styles[value] ?? "border-gray-200 bg-gray-50 text-gray-700"
+        "inline-flex min-w-[76px] items-center justify-center rounded border px-2.5 py-1 text-xs font-medium",
+        styles[value] ?? "bg-neutral-100 text-neutral-500 border-neutral-200"
       )}
     >
       {humanize(value)}

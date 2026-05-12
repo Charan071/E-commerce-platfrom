@@ -72,7 +72,7 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { title, slug, description, price, originalPrice, discount, material, stock, isNew, categoryId, colors, images } = body;
+    const { title, slug, description, price, originalPrice, discount, material, sizes, stock, isNew, categoryId, colors, images } = body;
 
     const product = await prisma.product.create({
       data: {
@@ -83,6 +83,7 @@ export async function POST(req: NextRequest) {
         originalPrice,
         discount,
         material,
+        sizes: sizes ?? [],
         stock: stock ?? 0,
         isNew: isNew ?? false,
         categoryId,

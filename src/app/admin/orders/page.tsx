@@ -51,35 +51,31 @@ export default async function AdminOrdersPage({ searchParams }: OrdersPageProps)
         <AdminMetricCard
           label="Total Orders"
           value={formatCompactNumber(data.metrics.total)}
-          detail="+28 this month"
+          detail={`${formatCompactNumber(data.metrics.ordersLast30Days)} in last 30 days`}
           icon={ShoppingBag}
           tone="brand"
         />
         <AdminMetricCard
           label="Pending"
           value={formatCompactNumber(data.metrics.pending)}
-          detail="View details"
           icon={Clock3}
           tone="amber"
         />
         <AdminMetricCard
           label="Processing"
           value={formatCompactNumber(data.metrics.processing)}
-          detail="View details"
           icon={Truck}
           tone="green"
         />
         <AdminMetricCard
           label="Shipped"
           value={formatCompactNumber(data.metrics.shipped)}
-          detail="View details"
           icon={PackageCheck}
           tone="blue"
         />
         <AdminMetricCard
           label="Delivered"
           value={formatCompactNumber(data.metrics.delivered)}
-          detail="View details"
           icon={CheckCircle2}
           tone="purple"
         />

@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { CATEGORIES, FABRICS, PRODUCTS, type Product } from "@/lib/mock-data";
+import { CATEGORIES, FABRICS, type Product } from "@/lib/mock-data";
 import { isExpectedSampleFallback, slugify } from "@/lib/sample-api";
 
 type DbProduct = {
@@ -11,6 +11,7 @@ type DbProduct = {
   originalPrice: unknown;
   discount: string | null;
   material: string;
+  sizes: string[];
   stock: number;
   isNew: boolean;
   category: { name: string; slug: string };
@@ -28,11 +29,11 @@ function toNumber(value: unknown) {
 }
 
 export function dbProductToProduct(product: DbProduct): Product {
+  const sorted = [...product.images].sort((a, b) => a.order - b.order);
   const primaryImage =
-    product.images.find((image) => !image.isHover)?.url ??
-    product.images[0]?.url ??
-    "/images/saree-1.png";
-  const hoverImage = product.images.find((image) => image.isHover)?.url;
+    sorted.find((img) => !img.isHover)?.url ?? sorted[0]?.url ?? "/images/saree-1.png";
+  const hoverImage = sorted.find((img) => img.isHover)?.url;
+  const allImages = sorted.map((img) => img.url);
 
   return {
     id: product.id,
@@ -49,8 +50,10 @@ export function dbProductToProduct(product: DbProduct): Product {
     category: product.category.name,
     image: primaryImage,
     hoverImage,
+    allImages: allImages.length > 0 ? allImages : undefined,
     isNew: product.isNew,
     stock: product.stock,
+    sizes: product.sizes.length > 0 ? product.sizes : undefined,
   };
 }
 
@@ -69,13 +72,12 @@ export async function getCatalogProducts(): Promise<Product[]> {
       },
     });
 
-    if (products.length === 0) return PRODUCTS;
     return products.map(dbProductToProduct);
   } catch (error) {
     if (!isExpectedSampleFallback(error)) {
       console.error("[catalog products]", error);
     }
-    return PRODUCTS;
+    return [];
   }
 }
 
@@ -103,7 +105,7 @@ export async function getCatalogProduct(id: string): Promise<Product | null> {
     }
   }
 
-  return PRODUCTS.find((product) => product.id === id || slugify(product.title) === id) ?? null;
+  return null;
 }
 
 export async function getCatalogFilters() {

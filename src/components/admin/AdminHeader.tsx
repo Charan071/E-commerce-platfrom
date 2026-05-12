@@ -20,7 +20,7 @@ const BREADCRUMB_MAP: Record<string, string> = {
 
 const PAGE_TITLE_MAP: Record<string, string> = {
   "/admin": "Dashboard",
-  "/admin/content": "Brand / Hero / Media Blocks",
+  "/admin/content": "Content Studio",
   "/admin/orders": "Orders",
   "/admin/products": "Inventory",
   "/admin/categories": "Categories",
@@ -69,8 +69,7 @@ export function AdminHeader({ pendingOrdersCount, adminEmail, adminName, brandNa
   const breadcrumb = pickBreadcrumb(pathname);
   const [search, setSearch] = useState("");
 
-  const displayInitial =
-    (adminName?.trim()?.charAt(0) || adminEmail?.trim()?.charAt(0) || "A").toUpperCase();
+  const displayInitial = (adminName?.trim()?.charAt(0) || adminEmail?.trim()?.charAt(0) || "A").toUpperCase();
   const displayLabel = adminName?.trim() || adminEmail?.split("@")[0] || "Admin";
 
   function onSearch(e: FormEvent) {
@@ -85,23 +84,23 @@ export function AdminHeader({ pendingOrdersCount, adminEmail, adminName, brandNa
   }
 
   return (
-    <header className="h-16 shrink-0 border-b border-[#e5d8cc] bg-[#faf7f4] px-4 sm:px-6">
+    <header className="h-14 shrink-0 border-b border-neutral-100 bg-white px-4 sm:px-6">
       <div className="flex h-full items-center gap-4">
         <button
           type="button"
-          className="text-[#a8927c] hover:text-[#6b5040] lg:hidden transition-colors"
+          className="text-neutral-400 hover:text-black lg:hidden transition-colors"
           aria-label="Open menu"
         >
           <Menu size={20} />
         </button>
 
         <div className="min-w-0 flex-1">
-          <h1 className="font-serif text-xl leading-none text-[#1e140d]">{title}</h1>
-          <p className="mt-0.5 text-xs text-[#a8927c]">
+          <h1 className="text-[15px] font-semibold leading-none text-black">{title}</h1>
+          <p className="mt-0.5 text-[11px] text-neutral-400">
             {brandName}
             {breadcrumb && breadcrumb !== "Dashboard" && (
               <>
-                <span className="mx-1.5 text-[#d4c4b4]">/</span>
+                <span className="mx-1.5 text-neutral-300">/</span>
                 {breadcrumb}
               </>
             )}
@@ -110,46 +109,40 @@ export function AdminHeader({ pendingOrdersCount, adminEmail, adminName, brandNa
 
         <form
           onSubmit={onSearch}
-          className="hidden w-64 items-center gap-2 rounded-lg border border-[#e5d8cc] bg-white px-3 py-2 md:flex focus-within:border-[var(--admin-primary)] transition-colors"
+          className="hidden w-60 items-center gap-2 rounded-md border border-neutral-200 bg-neutral-50 px-3 py-2 md:flex focus-within:border-neutral-400 focus-within:bg-white transition-colors"
         >
-          <Search size={14} className="shrink-0 text-[#a8927c]" aria-hidden />
+          <Search size={13} className="shrink-0 text-neutral-400" aria-hidden />
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             type="search"
             placeholder={getSearchPlaceholder(pathname)}
-            className="min-w-0 flex-1 bg-transparent text-sm text-[#1e140d] outline-none placeholder:text-[#c4a88e]"
+            className="min-w-0 flex-1 bg-transparent text-sm text-black outline-none placeholder:text-neutral-400"
             aria-label="Admin search"
           />
         </form>
 
         <Link
           href="/admin/orders?status=PENDING"
-          className="relative hidden p-1.5 text-[#a8927c] hover:text-[var(--admin-primary)] sm:inline-flex transition-colors"
+          className="relative hidden p-1.5 text-neutral-400 hover:text-black sm:inline-flex transition-colors"
           aria-label={`Pending orders: ${pendingOrdersCount}`}
         >
-          <Bell size={18} />
-          {pendingOrdersCount > 0 ? (
-            <span
-              className="absolute right-0.5 top-0.5 flex h-4 min-w-4 px-1 items-center justify-center rounded-full text-[9px] font-bold text-white"
-              style={{ backgroundColor: "var(--admin-primary)" }}
-            >
+          <Bell size={17} />
+          {pendingOrdersCount > 0 && (
+            <span className="absolute right-0.5 top-0.5 flex h-4 min-w-4 px-1 items-center justify-center rounded-full text-[9px] font-bold text-white bg-black">
               {pendingOrdersCount > 99 ? "99+" : pendingOrdersCount}
             </span>
-          ) : null}
+          )}
         </Link>
 
         <div className="flex items-center gap-2">
-          <div
-            className="flex h-7 w-7 items-center justify-center rounded-full text-[11px] font-bold text-white"
-            style={{ backgroundColor: "var(--admin-primary)" }}
-          >
+          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-black text-[11px] font-bold text-white">
             {displayInitial}
           </div>
-          <span className="hidden text-sm font-medium text-[#6b5040] md:block max-w-[9rem] truncate">
+          <span className="hidden text-sm text-neutral-700 md:block max-w-[9rem] truncate">
             {displayLabel}
           </span>
-          <ChevronDown size={14} className="hidden text-[#a8927c] md:block" aria-hidden />
+          <ChevronDown size={13} className="hidden text-neutral-400 md:block" aria-hidden />
         </div>
       </div>
     </header>

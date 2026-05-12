@@ -1,152 +1,260 @@
+import Image from "next/image";
 import { prisma } from "@/lib/prisma";
 import {
   addCollectionHighlight,
+  addHero,
   addNavPromo,
   deleteCollectionHighlight,
   deleteNavPromo,
   updateBrandKit,
-  upsertHero,
 } from "./actions";
+import { EditableBannerList } from "@/components/admin/EditableBannerList";
 
 export const dynamic = "force-dynamic";
 
+const inputClass =
+  "w-full rounded-md border border-neutral-200 bg-white px-3 py-2 text-sm text-black placeholder:text-neutral-400 outline-none focus:border-black transition";
+const labelClass = "block text-[10px] font-semibold uppercase tracking-wider text-neutral-400 mb-1";
+const sectionClass = "rounded-lg border border-neutral-100 bg-white p-6 space-y-5";
+const saveBtn = "inline-flex h-9 items-center px-4 rounded-md text-sm font-semibold text-white bg-black hover:bg-neutral-800 transition-colors";
+
 export default async function AdminContentPage() {
-  const [brandKit, hero, highlights, navPromos] = await Promise.all([
+  const [brandKit, banners, highlights, navPromos] = await Promise.all([
     prisma.brandKit.findFirst({ orderBy: { createdAt: "asc" } }).catch(() => null),
-    prisma.homeHero.findFirst({ orderBy: { createdAt: "asc" } }).catch(() => null),
+    prisma.homeHero.findMany({ orderBy: { createdAt: "asc" } }).catch(() => []),
     prisma.collectionHighlight.findMany({ orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }] }).catch(() => []),
     prisma.navPromoBlock.findMany({ orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }] }).catch(() => []),
   ]);
 
   return (
-    <div className="space-y-6">
-      <section className="rounded-lg border border-[#eadfd5] bg-white p-5 shadow-sm">
-        <h2 className="font-serif text-2xl text-[#1e140d]">Brand Kit</h2>
-        <p className="mt-1 text-sm text-[#7c6652]">
-          Core brand identity tokens used by storefront layout and navigation.
-        </p>
-        <form action={updateBrandKit} className="mt-5 grid gap-4 md:grid-cols-2">
-          <input name="brandName" defaultValue={brandKit?.brandName ?? "AnavaSilks"} placeholder="Brand name" className="rounded-md border border-[#eadfd5] px-3 py-2 text-sm" />
-          <input name="tagline" defaultValue={brandKit?.tagline ?? "Silk and Sarees"} placeholder="Tagline" className="rounded-md border border-[#eadfd5] px-3 py-2 text-sm" />
+    <div className="space-y-6 max-w-3xl">
+      <div>
+        <h2 className="text-xl font-semibold text-black">Store Content</h2>
+        <p className="mt-1 text-sm text-neutral-500">Control what customers see on your storefront — no code needed.</p>
+      </div>
 
-          <label className="flex flex-col gap-1 text-xs text-[#9c8270]">
-            Primary (text/actions)
-            <input type="color" name="primaryColor" defaultValue={brandKit?.primaryColor ?? "#171717"} className="h-9 w-full cursor-pointer rounded-md border border-[#eadfd5] px-1 py-1" />
-          </label>
-          <label className="flex flex-col gap-1 text-xs text-[#9c8270]">
-            Secondary (page background)
-            <input type="color" name="secondaryColor" defaultValue={brandKit?.secondaryColor ?? "#f6f4f0"} className="h-9 w-full cursor-pointer rounded-md border border-[#eadfd5] px-1 py-1" />
-          </label>
-          <label className="flex flex-col gap-1 text-xs text-[#9c8270]">
-            Accent (luxury highlight)
-            <input type="color" name="accentColor" defaultValue={brandKit?.accentColor ?? "#8b6a3e"} className="h-9 w-full cursor-pointer rounded-md border border-[#eadfd5] px-1 py-1" />
-          </label>
-          <label className="flex flex-col gap-1 text-xs text-[#9c8270]">
-            Surface (card / white background)
-            <input type="color" name="surfaceColor" defaultValue={brandKit?.surfaceColor ?? "#ffffff"} className="h-9 w-full cursor-pointer rounded-md border border-[#eadfd5] px-1 py-1" />
-          </label>
-          <label className="flex flex-col gap-1 text-xs text-[#9c8270]">
-            Muted text (secondary copy)
-            <input type="color" name="mutedTextColor" defaultValue={brandKit?.mutedTextColor ?? "#6b6b6b"} className="h-9 w-full cursor-pointer rounded-md border border-[#eadfd5] px-1 py-1" />
-          </label>
-          <input name="navLetterSpacing" defaultValue={brandKit?.navLetterSpacing ?? "0.22em"} placeholder="Nav letter spacing e.g. 0.22em" className="rounded-md border border-[#eadfd5] px-3 py-2 text-sm" />
-
-          <input name="headingFont" defaultValue={brandKit?.headingFont ?? "Playfair Display"} placeholder="Heading font (reference)" className="rounded-md border border-[#eadfd5] px-3 py-2 text-sm" />
-          <input name="bodyFont" defaultValue={brandKit?.bodyFont ?? "Inter"} placeholder="Body font (reference)" className="rounded-md border border-[#eadfd5] px-3 py-2 text-sm" />
-          <p className="text-xs text-[#b09880] md:col-span-2 -mt-2">Font fields are reference metadata — the active fonts (Playfair Display, Inter) are loaded statically and require a code deploy to change.</p>
-          <textarea name="voice" defaultValue={brandKit?.voice ?? ""} placeholder="Brand voice" className="rounded-md border border-[#eadfd5] px-3 py-2 text-sm md:col-span-2 min-h-20" />
-          <div className="md:col-span-2">
-            <button type="submit" className="rounded-md bg-[var(--admin-primary)] px-4 py-2 text-sm font-medium text-white">Save Brand Kit</button>
-          </div>
-        </form>
-      </section>
-
-      <section className="rounded-lg border border-[#eadfd5] bg-white p-5 shadow-sm">
-        <h2 className="font-serif text-2xl text-[#1e140d]">Homepage Hero</h2>
-        <form action={upsertHero} className="mt-5 grid gap-4 md:grid-cols-2">
-          <input name="title" defaultValue={hero?.title ?? "Whisper of Summer"} placeholder="Hero title" className="rounded-md border border-[#eadfd5] px-3 py-2 text-sm md:col-span-2" />
-          <input name="subtitle" defaultValue={hero?.subtitle ?? ""} placeholder="Hero subtitle" className="rounded-md border border-[#eadfd5] px-3 py-2 text-sm md:col-span-2" />
-          <input name="ctaLabel" defaultValue={hero?.ctaLabel ?? "Shop Here"} placeholder="CTA label" className="rounded-md border border-[#eadfd5] px-3 py-2 text-sm" />
-          <input name="ctaHref" defaultValue={hero?.ctaHref ?? "/collections"} placeholder="/collections" className="rounded-md border border-[#eadfd5] px-3 py-2 text-sm" />
-          <input name="imageUrl" defaultValue={hero?.imageUrl ?? "/images/hero.png"} placeholder="Cloudinary image URL" className="rounded-md border border-[#eadfd5] px-3 py-2 text-sm md:col-span-2" />
-          <input name="imagePublicId" defaultValue={hero?.imagePublicId ?? ""} placeholder="Cloudinary public_id (optional)" className="rounded-md border border-[#eadfd5] px-3 py-2 text-sm md:col-span-2" />
-          <label className="flex items-center gap-2 text-sm text-[#6b5040] md:col-span-2">
-            <input type="checkbox" name="isActive" defaultChecked={hero?.isActive ?? true} /> Active hero
-          </label>
-          <div className="md:col-span-2">
-            <button type="submit" className="rounded-md bg-[var(--admin-primary)] px-4 py-2 text-sm font-medium text-white">Save Hero</button>
-          </div>
-        </form>
-      </section>
-
-      <section className="rounded-lg border border-[#eadfd5] bg-white p-5 shadow-sm">
-        <h2 className="font-serif text-2xl text-[#1e140d]">Collection Highlights</h2>
-        <p className="mt-1 text-sm text-[#7c6652]">Cards used on homepage featured collections.</p>
-        <form action={addCollectionHighlight} className="mt-5 grid gap-3 md:grid-cols-2">
-          <input name="title" placeholder="Title" className="rounded-md border border-[#eadfd5] px-3 py-2 text-sm" />
-          <input name="subtitle" placeholder="Subtitle" className="rounded-md border border-[#eadfd5] px-3 py-2 text-sm" />
-          <input name="href" placeholder="/collections" className="rounded-md border border-[#eadfd5] px-3 py-2 text-sm" />
-          <input name="sortOrder" placeholder="Sort order" className="rounded-md border border-[#eadfd5] px-3 py-2 text-sm" />
-          <input name="imageUrl" placeholder="Image URL" className="rounded-md border border-[#eadfd5] px-3 py-2 text-sm md:col-span-2" />
-          <input name="imagePublicId" placeholder="Image public_id (optional)" className="rounded-md border border-[#eadfd5] px-3 py-2 text-sm md:col-span-2" />
-          <label className="flex items-center gap-2 text-sm text-[#6b5040] md:col-span-2">
-            <input type="checkbox" name="imageHasEmbeddedText" />
-            Image has embedded text (hide overlay copy on storefront)
-          </label>
-          <label className="flex items-center gap-2 text-sm text-[#6b5040] md:col-span-2"><input type="checkbox" name="isActive" defaultChecked /> Active</label>
-          <div className="md:col-span-2"><button type="submit" className="rounded-md bg-[var(--admin-primary)] px-4 py-2 text-sm font-medium text-white">Add Highlight</button></div>
-        </form>
-        <div className="mt-5 space-y-2">
-          {highlights.map((item) => (
-            <div key={item.id} className="flex items-center justify-between rounded border border-[#eadfd5] p-3 text-sm">
-              <div>
-                <p className="font-medium">{item.title}</p>
-                <p className="text-gray-500">
-                  {item.subtitle} · {item.href} · #{item.sortOrder}
-                  {item.imageHasEmbeddedText ? " · Embedded text: Yes" : " · Embedded text: No"}
-                </p>
-              </div>
-              <form action={deleteCollectionHighlight.bind(null, item.id)}>
-                <button type="submit" className="text-[var(--admin-primary)] hover:opacity-70 transition-opacity text-sm font-medium">Delete</button>
-              </form>
-            </div>
-          ))}
+      {/* ── 1. Store Identity ── */}
+      <section className={sectionClass}>
+        <div>
+          <h3 className="font-semibold text-black">Store Identity</h3>
+          <p className="text-xs text-neutral-400 mt-0.5">Brand name, tagline, and colours shown across the site.</p>
         </div>
+
+        <form action={updateBrandKit} className="space-y-4">
+          <input type="hidden" name="voice" value={brandKit?.voice ?? ""} />
+          <input type="hidden" name="headingFont" value={brandKit?.headingFont ?? "Playfair Display"} />
+          <input type="hidden" name="bodyFont" value={brandKit?.bodyFont ?? "Inter"} />
+          <input type="hidden" name="navLetterSpacing" value={brandKit?.navLetterSpacing ?? "0.22em"} />
+          <input type="hidden" name="accentColor" value={brandKit?.accentColor ?? "#8b6a3e"} />
+          <input type="hidden" name="surfaceColor" value={brandKit?.surfaceColor ?? "#ffffff"} />
+          <input type="hidden" name="mutedTextColor" value={brandKit?.mutedTextColor ?? "#6b6b6b"} />
+
+          <div className="grid gap-4 md:grid-cols-2">
+            <div>
+              <label className={labelClass}>Store name</label>
+              <input name="brandName" defaultValue={brandKit?.brandName ?? "AnavaSilks"} placeholder="AnavaSilks" className={inputClass} />
+            </div>
+            <div>
+              <label className={labelClass}>Tagline</label>
+              <input name="tagline" defaultValue={brandKit?.tagline ?? "Silk and Sarees"} placeholder="Silk and Sarees" className={inputClass} />
+            </div>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-2">
+            <div>
+              <label className={labelClass}>Primary colour <span className="normal-case font-normal text-neutral-400">(buttons, text, icons)</span></label>
+              <div className="flex items-center gap-3 mt-1">
+                <input type="color" name="primaryColor" defaultValue={brandKit?.primaryColor ?? "#171717"} className="h-9 w-14 cursor-pointer rounded border border-neutral-200 p-1" />
+                <span className="text-xs text-neutral-400">{brandKit?.primaryColor ?? "#171717"}</span>
+              </div>
+            </div>
+            <div>
+              <label className={labelClass}>Background colour <span className="normal-case font-normal text-neutral-400">(page background)</span></label>
+              <div className="flex items-center gap-3 mt-1">
+                <input type="color" name="secondaryColor" defaultValue={brandKit?.secondaryColor ?? "#f6f4f0"} className="h-9 w-14 cursor-pointer rounded border border-neutral-200 p-1" />
+                <span className="text-xs text-neutral-400">{brandKit?.secondaryColor ?? "#f6f4f0"}</span>
+              </div>
+            </div>
+          </div>
+
+          <button type="submit" className={saveBtn}>Save identity</button>
+        </form>
       </section>
 
-      <section className="rounded-lg border border-[#eadfd5] bg-white p-5 shadow-sm">
-        <h2 className="font-serif text-2xl text-[#1e140d]">Navigation Promo Blocks</h2>
-        <p className="mt-1 text-sm text-[#7c6652]">Cards used in hover mega menu under Shop.</p>
-        <form action={addNavPromo} className="mt-5 grid gap-3 md:grid-cols-2">
-          <input name="title" placeholder="Title" className="rounded-md border border-[#eadfd5] px-3 py-2 text-sm" />
-          <input name="subtitle" placeholder="Subtitle" className="rounded-md border border-[#eadfd5] px-3 py-2 text-sm" />
-          <input name="href" placeholder="/collections" className="rounded-md border border-[#eadfd5] px-3 py-2 text-sm" />
-          <input name="sortOrder" placeholder="Sort order" className="rounded-md border border-[#eadfd5] px-3 py-2 text-sm" />
-          <input name="imageUrl" placeholder="Image URL" className="rounded-md border border-[#eadfd5] px-3 py-2 text-sm md:col-span-2" />
-          <input name="imagePublicId" placeholder="Image public_id (optional)" className="rounded-md border border-[#eadfd5] px-3 py-2 text-sm md:col-span-2" />
-          <label className="flex items-center gap-2 text-sm text-[#6b5040] md:col-span-2">
-            <input type="checkbox" name="imageHasEmbeddedText" />
-            Image has embedded text (hide overlay copy on storefront)
-          </label>
-          <label className="flex items-center gap-2 text-sm text-[#6b5040] md:col-span-2"><input type="checkbox" name="isActive" defaultChecked /> Active</label>
-          <div className="md:col-span-2"><button type="submit" className="rounded-md bg-[var(--admin-primary)] px-4 py-2 text-sm font-medium text-white">Add Nav Promo</button></div>
-        </form>
-        <div className="mt-5 space-y-2">
-          {navPromos.map((item) => (
-            <div key={item.id} className="flex items-center justify-between rounded border border-[#eadfd5] p-3 text-sm">
-              <div>
-                <p className="font-medium">{item.title}</p>
-                <p className="text-gray-500">
-                  {item.subtitle} · {item.href} · #{item.sortOrder}
-                  {item.imageHasEmbeddedText ? " · Embedded text: Yes" : " · Embedded text: No"}
-                </p>
-              </div>
-              <form action={deleteNavPromo.bind(null, item.id)}>
-                <button type="submit" className="text-[var(--admin-primary)] hover:opacity-70 transition-opacity text-sm font-medium">Delete</button>
-              </form>
-            </div>
-          ))}
+      {/* ── 2. Homepage Banners ── */}
+      <section className={sectionClass}>
+        <div>
+          <h3 className="font-semibold text-black">Homepage Banners</h3>
+          <p className="text-xs text-neutral-400 mt-0.5">Multiple banners rotate as a carousel. Active banners cycle every 5 seconds.</p>
         </div>
+
+        <EditableBannerList banners={banners} />
+
+        <form action={addHero} className="space-y-4 pt-4 border-t border-neutral-100">
+          <p className={labelClass}>Add banner</p>
+          <input type="hidden" name="imagePublicId" value="" />
+
+          <div className="grid gap-4 md:grid-cols-2">
+            <div>
+              <label className={labelClass}>Headline</label>
+              <input name="title" placeholder="e.g. New Summer Collection" className={inputClass} />
+            </div>
+            <div>
+              <label className={labelClass}>Subheading <span className="normal-case font-normal text-neutral-400">(optional)</span></label>
+              <input name="subtitle" placeholder="A short description" className={inputClass} />
+            </div>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-2">
+            <div>
+              <label className={labelClass}>Button label</label>
+              <input name="ctaLabel" placeholder="Shop Here" defaultValue="Shop Here" className={inputClass} />
+            </div>
+            <div>
+              <label className={labelClass}>Button link</label>
+              <input name="ctaHref" placeholder="/shop" defaultValue="/shop" className={inputClass} />
+            </div>
+          </div>
+
+          <div>
+            <label className={labelClass}>Banner image URL</label>
+            <input name="imageUrl" placeholder="https://res.cloudinary.com/…" className={inputClass} />
+          </div>
+
+          <div className="flex items-center gap-3">
+            <input type="checkbox" name="isActive" id="newHeroActive" defaultChecked className="h-4 w-4 rounded border-neutral-300 accent-black" />
+            <label htmlFor="newHeroActive" className="text-sm text-neutral-700 cursor-pointer">Make live immediately</label>
+          </div>
+
+          <button type="submit" className={saveBtn}>Add banner</button>
+        </form>
+      </section>
+
+      {/* ── 3. Shop Menu Images ── */}
+      <section className={sectionClass}>
+        <div>
+          <h3 className="font-semibold text-black">Shop Menu Images</h3>
+          <p className="text-xs text-neutral-400 mt-0.5">Up to 2 images shown when customers hover "Shop" in the navigation bar.</p>
+        </div>
+
+        {navPromos.length > 0 && (
+          <div className="space-y-2">
+            {navPromos.map((item) => (
+              <div key={item.id} className="flex items-center gap-3 rounded-md border border-neutral-100 p-3">
+                {item.imageUrl && (
+                  <div className="relative h-12 w-9 shrink-0 overflow-hidden rounded border border-neutral-100">
+                    <Image src={item.imageUrl} alt={item.title} fill className="object-cover" />
+                  </div>
+                )}
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-black truncate">{item.title}</p>
+                  <p className="text-xs text-neutral-400 truncate">{item.href}</p>
+                </div>
+                <form action={deleteNavPromo.bind(null, item.id)}>
+                  <button type="submit" className="shrink-0 text-xs text-neutral-400 hover:text-red-500 transition-colors">Remove</button>
+                </form>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {navPromos.length < 2 && (
+          <form action={addNavPromo} className="space-y-3 pt-2 border-t border-neutral-100">
+            <p className={labelClass}>Add image</p>
+            <input type="hidden" name="imagePublicId" value="" />
+            <input type="hidden" name="imageHasEmbeddedText" value="" />
+            <input type="hidden" name="isActive" value="on" />
+            <input type="hidden" name="sortOrder" value={String(navPromos.length)} />
+            <input type="hidden" name="subtitle" value="" />
+
+            <div className="grid gap-3 md:grid-cols-2">
+              <div>
+                <label className={labelClass}>Title</label>
+                <input name="title" placeholder="e.g. New Arrivals" className={inputClass} />
+              </div>
+              <div>
+                <label className={labelClass}>Link</label>
+                <input name="href" placeholder="/shop" defaultValue="/shop" className={inputClass} />
+              </div>
+            </div>
+            <div>
+              <label className={labelClass}>Image URL</label>
+              <input name="imageUrl" placeholder="https://res.cloudinary.com/…" className={inputClass} />
+            </div>
+
+            <button type="submit" className={saveBtn}>Add image</button>
+          </form>
+        )}
+
+        {navPromos.length >= 2 && (
+          <p className="text-xs text-neutral-400">You have 2 images — remove one to add another.</p>
+        )}
+      </section>
+
+      {/* ── 4. Featured Collections ── */}
+      <section className={sectionClass}>
+        <div>
+          <h3 className="font-semibold text-black">Featured Collections</h3>
+          <p className="text-xs text-neutral-400 mt-0.5">Highlight collections on your homepage. Add up to 4.</p>
+        </div>
+
+        {highlights.length > 0 && (
+          <div className="space-y-2">
+            {highlights.map((item) => (
+              <div key={item.id} className="flex items-center gap-3 rounded-md border border-neutral-100 p-3">
+                {item.imageUrl && (
+                  <div className="relative h-12 w-9 shrink-0 overflow-hidden rounded border border-neutral-100">
+                    <Image src={item.imageUrl} alt={item.title} fill className="object-cover" />
+                  </div>
+                )}
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-black truncate">{item.title}</p>
+                  <p className="text-xs text-neutral-400 truncate">{item.subtitle} · {item.href}</p>
+                </div>
+                <form action={deleteCollectionHighlight.bind(null, item.id)}>
+                  <button type="submit" className="shrink-0 text-xs text-neutral-400 hover:text-red-500 transition-colors">Remove</button>
+                </form>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {highlights.length < 4 && (
+          <form action={addCollectionHighlight} className="space-y-3 pt-2 border-t border-neutral-100">
+            <p className={labelClass}>Add collection</p>
+            <input type="hidden" name="imagePublicId" value="" />
+            <input type="hidden" name="imageHasEmbeddedText" value="" />
+            <input type="hidden" name="isActive" value="on" />
+            <input type="hidden" name="sortOrder" value={String(highlights.length)} />
+
+            <div className="grid gap-3 md:grid-cols-2">
+              <div>
+                <label className={labelClass}>Collection name</label>
+                <input name="title" placeholder="e.g. Kanchipuram Silk" className={inputClass} />
+              </div>
+              <div>
+                <label className={labelClass}>Tagline <span className="normal-case font-normal text-neutral-400">(optional)</span></label>
+                <input name="subtitle" placeholder="e.g. Timeless elegance" className={inputClass} />
+              </div>
+            </div>
+            <div className="grid gap-3 md:grid-cols-2">
+              <div>
+                <label className={labelClass}>Link</label>
+                <input name="href" placeholder="/shop?category=Kanchipuram+Silk" className={inputClass} />
+              </div>
+              <div>
+                <label className={labelClass}>Image URL</label>
+                <input name="imageUrl" placeholder="https://res.cloudinary.com/…" className={inputClass} />
+              </div>
+            </div>
+
+            <button type="submit" className={saveBtn}>Add collection</button>
+          </form>
+        )}
+
+        {highlights.length >= 4 && (
+          <p className="text-xs text-neutral-400">You have 4 collections — remove one to add another.</p>
+        )}
       </section>
     </div>
   );

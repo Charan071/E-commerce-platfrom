@@ -4,13 +4,15 @@ import React, { createContext, useContext, useState, useEffect, useRef, ReactNod
 import { Product } from "./mock-data";
 
 export interface CartItem extends Product {
-  cartItemId: string; // Unique ID for cart entry (in case same product added with different variants later)
+  cartItemId: string;
   quantity: number;
+  selectedSize?: string;
+  selectedColor?: string;
 }
 
 interface CartContextType {
   cart: CartItem[];
-  addToCart: (product: Product, quantity?: number) => void;
+  addToCart: (product: Product, quantity?: number, selectedSize?: string, selectedColor?: string) => void;
   removeFromCart: (cartItemId: string) => void;
   updateQuantity: (cartItemId: string, quantity: number) => void;
   clearCart: () => void;
@@ -50,15 +52,17 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     localStorage.setItem("anavasilks_cart", JSON.stringify(cart));
   }, [cart]);
 
-  const addToCart = (product: Product, quantity: number = 1) => {
+  const addToCart = (product: Product, quantity: number = 1, selectedSize?: string, selectedColor?: string) => {
     setCart((prevCart) => {
-      const existingItemIndex = prevCart.findIndex((item) => item.id === product.id);
+      const existingItemIndex = prevCart.findIndex(
+        (item) => item.id === product.id && item.selectedSize === selectedSize && item.selectedColor === selectedColor
+      );
       if (existingItemIndex > -1) {
         const newCart = [...prevCart];
         newCart[existingItemIndex].quantity += quantity;
         return newCart;
       }
-      return [...prevCart, { ...product, cartItemId: `${product.id}-${Date.now()}`, quantity }];
+      return [...prevCart, { ...product, cartItemId: `${product.id}-${Date.now()}`, quantity, selectedSize, selectedColor }];
     });
   };
 

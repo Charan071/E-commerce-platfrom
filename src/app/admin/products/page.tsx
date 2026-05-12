@@ -11,8 +11,8 @@ import {
   Search,
   Tag,
   Trash2,
-  UploadCloud,
 } from "lucide-react";
+import { ProductCsvImport } from "@/components/admin/ProductCsvImport";
 import { AdminMetricCard } from "@/components/admin/AdminMetricCard";
 import { AdminPagination } from "@/components/admin/AdminPagination";
 import { AdminStatusBadge } from "@/components/admin/AdminStatusBadge";
@@ -50,28 +50,28 @@ export default async function AdminProductsPage({ searchParams }: ProductsPagePr
         <AdminMetricCard
           label="Total Products"
           value={formatCompactNumber(data.metrics.total)}
-          detail="+12 this month"
+          detail={`${formatCompactNumber(data.metrics.productsCreatedLast30Days)} added in last 30 days`}
           icon={Package}
           tone="brand"
         />
         <AdminMetricCard
           label="Total Categories"
           value={formatCompactNumber(data.metrics.categories)}
-          detail="+2 this month"
+          detail={`${formatCompactNumber(data.metrics.categoriesCreatedLast30Days)} added in last 30 days`}
           icon={Box}
           tone="amber"
         />
         <AdminMetricCard
           label="Low Stock Items"
           value={formatCompactNumber(data.metrics.lowStock)}
-          detail="View all"
+          detail="Stock 1–5 units"
           icon={Package}
           tone="brand"
         />
         <AdminMetricCard
           label="Out of Stock"
           value={formatCompactNumber(data.metrics.outOfStock)}
-          detail="View all"
+          detail="Stock 0"
           icon={Tag}
           tone="amber"
         />
@@ -87,14 +87,11 @@ export default async function AdminProductsPage({ searchParams }: ProductsPagePr
       <section className="rounded-lg border border-[#eadfd5] bg-white shadow-sm">
         <div className="flex flex-col gap-4 border-b border-[#eadfd5] px-5 py-4 lg:flex-row lg:items-center lg:justify-between">
           <h2 className="font-serif text-2xl text-gray-950">All Products</h2>
-          <div className="flex flex-wrap gap-3">
-            <button
-              type="button"
-              className="inline-flex h-10 items-center gap-2 rounded-md border border-[#e5d8cc] px-4 text-sm font-medium text-[#6b5040] hover:bg-[#f5ede3] transition-colors"
-            >
-              <UploadCloud size={16} />
-              Import Products
-            </button>
+          <div className="flex flex-wrap items-start gap-3">
+            <ProductCsvImport
+              disabled={data.source === "sample"}
+              disabledReason="Database catalog is unavailable. Connect your database to import CSV files."
+            />
             <Link
               href="/admin/products/new"
               className="inline-flex h-10 items-center gap-2 rounded-md bg-[var(--admin-primary)] px-4 text-sm font-medium text-white shadow-sm hover:opacity-90"
