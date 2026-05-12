@@ -134,7 +134,9 @@ export default async function AdminContentPage() {
       <section className={sectionClass}>
         <div>
           <h3 className="font-semibold text-black">Shop Menu Images</h3>
-          <p className="text-xs text-neutral-400 mt-0.5">Up to 2 images shown when customers hover "Shop" in the navigation bar.</p>
+          <p className="text-xs text-neutral-400 mt-0.5">
+            Up to 2 images shown when customers hover &ldquo;Shop&rdquo; in the navigation bar.
+          </p>
         </div>
 
         {navPromos.length > 0 && (

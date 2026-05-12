@@ -1,6 +1,10 @@
 import { prisma } from "@/lib/prisma";
 import { PRODUCTS } from "@/lib/mock-data";
-import type { Prisma } from "@prisma/client";
+import type { PrismaClient } from "@prisma/client";
+
+/** Where-clause types derived from the client (avoids `import type { Prisma }` — unreliable on some CI/Vercel type resolutions). */
+type OrderWhereInput = NonNullable<Parameters<PrismaClient["order"]["findMany"]>[0]>["where"];
+type ProductWhereInput = NonNullable<Parameters<PrismaClient["product"]["findMany"]>[0]>["where"];
 
 export const ORDER_STATUSES = [
   "PENDING",
@@ -369,7 +373,7 @@ export async function getAdminOrders(params: SearchParamsInput): Promise<AdminOr
   const paymentStatus = getTextFilter(params, "paymentStatus");
 
   try {
-    const where: Prisma.OrderWhereInput = {};
+    const where: OrderWhereInput = {};
 
     if (status && ORDER_STATUSES.includes(status as (typeof ORDER_STATUSES)[number])) {
       where.status = status as (typeof ORDER_STATUSES)[number];
@@ -441,7 +445,7 @@ export async function getAdminProducts(params: SearchParamsInput): Promise<Admin
   const status = getTextFilter(params, "status");
 
   try {
-    const where: Prisma.ProductWhereInput = { isActive: true };
+    const where: ProductWhereInput = { isActive: true };
 
     if (q) {
       where.OR = [

@@ -1,12 +1,12 @@
 import { prisma } from "@/lib/prisma";
-import type { Prisma } from "@prisma/client";
 
 type AuditPayload = {
   userId: string;
   email?: string;
   action: string;
   target: string;
-  details?: Prisma.InputJsonValue;
+  /** JSON-serializable payload for the audit row (avoid `Prisma` namespace import for CI compatibility). */
+  details?: Record<string, unknown> | unknown[] | string | number | boolean | null;
 };
 
 export async function logAdminAudit(payload: AuditPayload) {
@@ -17,7 +17,9 @@ export async function logAdminAudit(payload: AuditPayload) {
         email: payload.email,
         action: payload.action,
         target: payload.target,
-        details: payload.details,
+        ...(payload.details !== undefined
+          ? { details: JSON.parse(JSON.stringify(payload.details)) as object }
+          : {}),
       },
     });
   } catch (error) {

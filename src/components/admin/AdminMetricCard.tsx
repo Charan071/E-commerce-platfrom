@@ -5,7 +5,7 @@ export function AdminMetricCard({
   value,
   detail,
   icon: Icon,
-  tone: _tone,
+  tone,
 }: {
   label: string;
   value: string | number;
@@ -13,6 +13,7 @@ export function AdminMetricCard({
   icon: LucideIcon;
   tone?: string;
 }) {
+  void tone;
   return (
     <div className="rounded-lg border border-neutral-100 bg-white p-5">
       <div className="flex items-center gap-4">

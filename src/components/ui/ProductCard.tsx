@@ -29,16 +29,15 @@ export function ProductCard({ product, className, initiallyWishlisted = false }:
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
-    if (hovering && images.length > 1) {
-      timerRef.current = setInterval(() => {
-        setImgIdx((i) => (i + 1) % images.length);
-      }, 1400);
-    } else {
-      if (timerRef.current) clearInterval(timerRef.current);
-      if (!hovering) setImgIdx(0);
-    }
+    if (!hovering || images.length <= 1) return;
+    timerRef.current = setInterval(() => {
+      setImgIdx((i) => (i + 1) % images.length);
+    }, 1400);
     return () => {
-      if (timerRef.current) clearInterval(timerRef.current);
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
     };
   }, [hovering, images.length]);
 
@@ -46,7 +45,14 @@ export function ProductCard({ product, className, initiallyWishlisted = false }:
     <div
       className={cn("group relative flex flex-col bg-transparent", className)}
       onMouseEnter={() => setHovering(true)}
-      onMouseLeave={() => setHovering(false)}
+      onMouseLeave={() => {
+        setHovering(false);
+        if (timerRef.current) {
+          clearInterval(timerRef.current);
+          timerRef.current = null;
+        }
+        setImgIdx(0);
+      }}
     >
       {/* Image area */}
       <div className="relative aspect-[3/4] w-full overflow-hidden bg-[#f2efe9]">

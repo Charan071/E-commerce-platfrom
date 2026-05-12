@@ -139,6 +139,7 @@ export function ShopClient({ products, categories, fabrics, wishlistedProductIds
               className="flex items-center gap-2 h-full px-6 text-[11px] tracking-[0.2em] uppercase font-medium hover:bg-neutral-50 transition-colors"
             >
               SORT BY
+              <span className="ml-2 text-neutral-500 normal-case tracking-normal font-normal">{currentSortLabel}</span>
               <ChevronUp
                 size={11}
                 strokeWidth={1.5}

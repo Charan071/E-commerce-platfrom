@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { CATEGORIES, FABRICS, type Product } from "@/lib/mock-data";
-import { isExpectedSampleFallback, slugify } from "@/lib/sample-api";
+import { isExpectedSampleFallback } from "@/lib/sample-api";
 
 type DbProduct = {
   id: string;
