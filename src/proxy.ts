@@ -2,17 +2,15 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
 /**
- * Edge auth + admin gate.
- * Turbopack’s edge pipeline resolves this file as `src/middleware.ts`; keep this file (not `proxy.ts`)
- * if you use `next dev --turbopack`, or you’ll get “Could not parse module … middleware.ts”.
+ * Edge auth + admin gate (Next.js 16+ `proxy` convention; replaces deprecated `middleware`).
  */
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseAnon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
   if (!supabaseUrl || !supabaseAnon) {
-    console.error("[middleware] Missing NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY");
+    console.error("[proxy] Missing NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY");
     return supabaseResponse;
   }
 
