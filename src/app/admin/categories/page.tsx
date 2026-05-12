@@ -1,23 +1,24 @@
-import type { Prisma } from "@prisma/client";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { createCategory, deleteCategory } from "./actions";
 
 export const dynamic = "force-dynamic";
 
-const adminCategoryListArgs = {
-  orderBy: { name: "asc" as const },
-  include: {
-    _count: { select: { products: { where: { isActive: true } } } },
-  },
-} satisfies Prisma.CategoryFindManyArgs;
-
-type AdminCategoryRow = Prisma.CategoryGetPayload<typeof adminCategoryListArgs>;
+/** Minimal row type for this table (don’t import `Prisma` from `@prisma/client` — CI builds can lack that export). */
+type AdminCategoryRow = {
+  id: string;
+  name: string;
+  slug: string;
+  _count: { products: number };
+};
 
 export default async function AdminCategoriesPage() {
   const categories: AdminCategoryRow[] = await (async () => {
     try {
-      return await prisma.category.findMany(adminCategoryListArgs);
+      return await prisma.category.findMany({
+        orderBy: { name: "asc" },
+        include: { _count: { select: { products: { where: { isActive: true } } } } },
+      });
     } catch {
       return [];
     }
