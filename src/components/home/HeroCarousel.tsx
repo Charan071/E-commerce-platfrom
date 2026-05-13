@@ -29,7 +29,7 @@ function HeroPlaceholder({ eyebrow }: { eyebrow: string }) {
   );
 }
 
-const SLIDE_INTERVAL = 5000;
+const SLIDE_INTERVAL_MS = 6000;
 
 export function HeroCarousel({ slides, eyebrow }: { slides: Slide[]; eyebrow: string }) {
   const [active, setActive] = useState(0);
@@ -39,7 +39,7 @@ export function HeroCarousel({ slides, eyebrow }: { slides: Slide[]; eyebrow: st
 
   useEffect(() => {
     if (slides.length <= 1 || paused) return;
-    const id = setInterval(next, SLIDE_INTERVAL);
+    const id = setInterval(next, SLIDE_INTERVAL_MS);
     return () => clearInterval(id);
   }, [next, paused, slides.length]);
 
@@ -143,8 +143,11 @@ export function HeroCarousel({ slides, eyebrow }: { slides: Slide[]; eyebrow: st
         <div className="absolute bottom-0 left-0 right-0 z-30 h-px bg-white/10">
           <div
             key={active}
-            className="h-full bg-white/50 animate-slide-progress"
-            style={{ animationPlayState: paused ? "paused" : "running" }}
+            className="h-full bg-white/50"
+            style={{
+              animation: `slideProgress ${SLIDE_INTERVAL_MS}ms linear forwards`,
+              animationPlayState: paused ? "paused" : "running",
+            }}
           />
         </div>
       )}
