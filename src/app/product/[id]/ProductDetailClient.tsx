@@ -85,7 +85,7 @@ export function ProductDetailClient({
   }
 
   return (
-    <div className="bg-[var(--color-background)]">
+    <div className="bg-[var(--color-background)] pb-28 max-md:pb-32">
       {/* ── Main product section ── */}
       <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-10">
         <div className="grid grid-cols-1 lg:grid-cols-[1.15fr_1fr] gap-6 lg:gap-12 py-6 lg:py-8">
@@ -288,7 +288,7 @@ export function ProductDetailClient({
             </div>
 
             {/* Tabs */}
-            <div className="flex border-b border-neutral-200 mb-3 gap-5">
+            <div className="flex border-b border-neutral-200 mb-3 gap-5 overflow-x-auto hide-scrollbar pb-px -mb-px">
               {TABS.map((tab) => (
                 <button
                   key={tab}
@@ -374,11 +374,11 @@ export function ProductDetailClient({
 
       {/* ── Sticky bottom bar ── */}
       <div
-        className={`fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-neutral-200 transition-transform duration-300 ${
+        className={`fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-neutral-200 transition-transform duration-300 pb-safe ${
           stickyVisible ? "translate-y-0" : "translate-y-full"
         }`}
       >
-        <div className="max-w-screen-xl mx-auto px-6 sm:px-8 py-3.5 flex items-center justify-between gap-4">
+        <div className="max-w-screen-xl mx-auto px-4 sm:px-8 py-3.5 flex items-center justify-between gap-3">
           <div className="flex items-center gap-2.5 min-w-0">
             <span className="font-serif text-sm text-[var(--color-text)] truncate">{product.title}</span>
             <span className="text-neutral-300 shrink-0">•</span>

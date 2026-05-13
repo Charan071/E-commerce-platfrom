@@ -107,13 +107,13 @@ export function ShopClient({ products, categories, fabrics, wishlistedProductIds
       </div>
 
       {/* Filter + Sort bar */}
-      <div className="sticky top-[80px] z-30 bg-[var(--color-background)] border-y border-neutral-200">
-        <div className="max-w-screen-2xl mx-auto flex items-stretch h-12">
+      <div className="sticky top-[var(--site-header-sticky-offset)] z-30 bg-[var(--color-background)] border-y border-neutral-200">
+        <div className="max-w-screen-2xl mx-auto flex items-stretch min-h-12 h-auto">
           {/* FILTERS */}
           <button
             type="button"
             onClick={() => setDrawerOpen(true)}
-            className="flex items-center gap-2.5 px-6 text-[11px] tracking-[0.2em] uppercase font-medium border-r border-neutral-200 hover:bg-neutral-50 transition-colors shrink-0"
+            className="flex items-center gap-2 sm:gap-2.5 px-3 sm:px-6 text-[10px] sm:text-[11px] tracking-[0.2em] uppercase font-medium border-r border-neutral-200 hover:bg-neutral-50 transition-colors shrink-0 py-3"
           >
             <SlidersHorizontal size={13} strokeWidth={1.5} />
             FILTERS
@@ -125,25 +125,28 @@ export function ShopClient({ products, categories, fabrics, wishlistedProductIds
           </button>
 
           {/* Center count */}
-          <div className="flex-1 flex items-center justify-center text-xs text-neutral-400">
-            <span className={isPending ? "opacity-0" : ""}>
+          <div className="flex-1 flex items-center justify-center text-[11px] sm:text-xs text-neutral-400 px-2 min-w-0">
+            <span className={`truncate text-center ${isPending ? "opacity-0" : ""}`}>
               {filteredProducts.length} products
             </span>
           </div>
 
           {/* SORT BY */}
-          <div className="border-l border-neutral-200 relative shrink-0">
+          <div className="border-l border-neutral-200 relative shrink-0 min-w-0 max-w-[55%] sm:max-w-none">
             <button
               type="button"
               onClick={() => setSortOpen((v) => !v)}
-              className="flex items-center gap-2 h-full px-6 text-[11px] tracking-[0.2em] uppercase font-medium hover:bg-neutral-50 transition-colors"
+              className="flex items-center gap-1.5 sm:gap-2 h-full min-h-12 w-full px-3 sm:px-6 text-[10px] sm:text-[11px] tracking-[0.2em] uppercase font-medium hover:bg-neutral-50 transition-colors py-3"
             >
-              SORT BY
-              <span className="ml-2 text-neutral-500 normal-case tracking-normal font-normal">{currentSortLabel}</span>
+              <span className="shrink-0">SORT</span>
+              <span className="hidden sm:inline"> BY</span>
+              <span className="ml-0.5 sm:ml-2 text-neutral-500 normal-case tracking-normal font-normal truncate min-w-0">
+                {currentSortLabel}
+              </span>
               <ChevronUp
                 size={11}
                 strokeWidth={1.5}
-                className={`transition-transform duration-200 ${sortOpen ? "" : "rotate-180"}`}
+                className={`shrink-0 transition-transform duration-200 ${sortOpen ? "" : "rotate-180"}`}
               />
             </button>
 
@@ -153,7 +156,7 @@ export function ShopClient({ products, categories, fabrics, wishlistedProductIds
                   className="fixed inset-0 z-30"
                   onClick={() => setSortOpen(false)}
                 />
-                <div className="absolute right-0 top-full w-52 bg-white border border-neutral-200 z-40 py-1 shadow-sm">
+                <div className="absolute right-0 top-full w-52 max-w-[min(18rem,calc(100vw-1.5rem))] bg-white border border-neutral-200 z-40 py-1 shadow-sm">
                   {SORT_OPTIONS.map((opt) => (
                     <button
                       key={opt.value}
@@ -215,7 +218,7 @@ export function ShopClient({ products, categories, fabrics, wishlistedProductIds
 
       {/* Filter drawer panel */}
       <div
-        className={`fixed left-0 top-0 h-full w-80 bg-white z-50 flex flex-col transition-transform duration-300 ease-out ${
+        className={`fixed left-0 top-0 h-full w-[min(100%,20rem)] max-w-[100vw] bg-white z-50 flex flex-col transition-transform duration-300 ease-out ${
           drawerOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >

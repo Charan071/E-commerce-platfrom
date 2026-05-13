@@ -129,7 +129,7 @@ export default function CartPage() {
 
             {/* Order Summary */}
             <div className="lg:w-1/3">
-              <div className="bg-white rounded-sm shadow-sm p-6 sticky top-24">
+              <div className="bg-white rounded-sm shadow-sm p-6 sticky top-[var(--site-header-sticky-offset)]">
                 <h3 className="text-sm font-bold uppercase tracking-wider text-text mb-6 pb-4 border-b border-gray-100">
                   Order Summary
                 </h3>

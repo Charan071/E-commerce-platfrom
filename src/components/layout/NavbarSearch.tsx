@@ -68,7 +68,7 @@ export function NavbarSearch() {
 
       {/* Search overlay panel */}
       <div
-        className={`fixed top-0 left-0 right-0 z-[100] bg-white transition-transform duration-200 ease-out ${
+        className={`fixed top-0 left-0 right-0 z-[100] bg-white transition-transform duration-200 ease-out pt-safe ${
           open ? "translate-y-0" : "-translate-y-full"
         }`}
       >

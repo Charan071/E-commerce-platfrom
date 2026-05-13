@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import type { CSSProperties } from "react";
 import { Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
@@ -12,6 +12,16 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const playfair = Playfair_Display({ subsets: ["latin"], variable: "--font-playfair" });
 
 const siteUrl = getSiteUrl() ?? new URL("http://localhost:3000");
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#f6f4f0" },
+    { media: "(prefers-color-scheme: dark)", color: "#171717" },
+  ],
+};
 
 export const metadata: Metadata = {
   metadataBase: siteUrl,

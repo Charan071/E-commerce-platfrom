@@ -72,7 +72,7 @@ export function AccountMenu({ email, name, isAdmin }: AccountMenuProps) {
       {open && (
         <div
           role="menu"
-          className="absolute right-0 mt-3 w-64 origin-top-right rounded-md border border-neutral-200 bg-white p-2 shadow-xl"
+          className="absolute right-0 mt-3 w-64 max-w-[calc(100vw-1.25rem)] max-h-[min(70vh,28rem)] overflow-y-auto overscroll-contain origin-top-right rounded-md border border-neutral-200 bg-white p-2 shadow-xl"
         >
           <div className="px-3 pt-2 text-[10px] uppercase tracking-[0.18em] text-neutral-500">
             Signed in as

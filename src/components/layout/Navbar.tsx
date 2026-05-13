@@ -59,14 +59,16 @@ export default function Navbar({ user, brandName, navPromos, navCategories }: Na
   }, []);
 
   return (
-    <header className="sticky top-0 z-50 w-full bg-[var(--color-surface)] border-b border-neutral-200">
-      <div className="bg-[var(--color-text)] text-[var(--color-surface)] text-[10px] sm:text-[11px] py-2 px-4 text-center tracking-[0.18em] uppercase font-light">
-        Free Shipping On Orders Above ₹5,000 &nbsp;·&nbsp; Easy Returns &nbsp;·&nbsp; COD Available
+    <header className="sticky top-0 z-50 w-full bg-[var(--color-surface)] border-b border-neutral-200 pt-safe">
+      <div className="bg-[var(--color-text)] text-[var(--color-surface)] text-[10px] sm:text-[11px] py-2 px-3 sm:px-4 text-center tracking-[0.18em] uppercase font-light">
+        <p className="text-balance max-w-[100vw] mx-auto sm:whitespace-normal whitespace-nowrap overflow-x-auto hide-scrollbar sm:overflow-visible py-0.5">
+          Free Shipping On Orders Above ₹5,000 &nbsp;·&nbsp; Easy Returns &nbsp;·&nbsp; COD Available
+        </p>
       </div>
 
-      <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-10">
-        <div className="grid grid-cols-3 items-center h-20">
-          <nav className="hidden md:flex items-center gap-8">
+      <div className="max-w-screen-2xl mx-auto px-3 sm:px-6 lg:px-10">
+        <div className="grid grid-cols-[1fr_auto_1fr] items-center h-20 gap-2 sm:gap-4">
+          <nav className="hidden md:flex items-center gap-8 min-w-0 justify-self-start">
             <Link
               href="/"
               className="text-[12px] font-medium tracking-[var(--nav-letter-spacing)] uppercase text-neutral-800 hover:text-[var(--color-text)] transition-colors"
@@ -93,13 +95,14 @@ export default function Navbar({ user, brandName, navPromos, navCategories }: Na
 
           <Link
             href="/"
-            className="justify-self-center font-serif text-2xl sm:text-[28px] tracking-[0.32em] uppercase text-neutral-900 whitespace-nowrap"
+            className="justify-self-center font-serif text-xl sm:text-2xl md:text-[28px] tracking-[0.22em] sm:tracking-[0.28em] md:tracking-[0.32em] uppercase text-neutral-900 text-center max-w-[min(100%,11rem)] overflow-hidden text-ellipsis whitespace-nowrap sm:max-w-none sm:overflow-visible sm:whitespace-normal sm:text-clip"
             aria-label={brandName}
+            title={brandName}
           >
             {brandName}
           </Link>
 
-          <div className="justify-self-end flex items-center gap-5 sm:gap-6 text-neutral-800">
+          <div className="justify-self-end flex items-center justify-end gap-3 sm:gap-5 md:gap-6 text-neutral-800 min-w-0">
             <NavbarSearch />
 
             {user ? (
@@ -126,10 +129,10 @@ export default function Navbar({ user, brandName, navPromos, navCategories }: Na
         </div>
       </div>
 
-      <nav className="md:hidden border-t border-neutral-200 py-2 px-4 flex justify-center gap-6 text-[11px] tracking-[var(--nav-letter-spacing)] uppercase text-neutral-700">
-        <Link href="/">Home</Link>
-        <Link href="/shop">Shop</Link>
-        <Link href="/about">Contact Us</Link>
+      <nav className="md:hidden border-t border-neutral-200 py-2.5 px-3 flex justify-center gap-4 sm:gap-6 text-[10px] sm:text-[11px] tracking-[var(--nav-letter-spacing)] uppercase text-neutral-700 overflow-x-auto hide-scrollbar">
+        <Link href="/" className="shrink-0 py-1">Home</Link>
+        <Link href="/shop" className="shrink-0 py-1">Shop</Link>
+        <Link href="/about" className="shrink-0 py-1">Contact Us</Link>
       </nav>
 
       {isShopOpen && (

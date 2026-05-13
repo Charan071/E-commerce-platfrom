@@ -14,9 +14,9 @@ type Slide = {
 
 function HeroPlaceholder({ eyebrow }: { eyebrow: string }) {
   return (
-    <section className="relative w-full h-screen min-h-[600px] max-h-[1000px] bg-neutral-100 flex flex-col items-center justify-center text-center px-6">
+    <section className="relative w-full min-h-[max(37.5rem,100svh)] max-h-[1000px] bg-neutral-100 flex flex-col items-center justify-center text-center px-6">
       <p className="text-[9px] uppercase tracking-[0.4em] text-neutral-400 mb-5">{eyebrow}</p>
-      <h1 className="font-serif text-5xl sm:text-6xl md:text-7xl text-neutral-300 leading-[0.95] mb-6">
+        <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-neutral-300 leading-[0.95] mb-6 break-words max-w-lg">
         Your Hero Image
       </h1>
       <p className="text-xs text-neutral-400 max-w-xs leading-relaxed">
@@ -50,7 +50,7 @@ export function HeroCarousel({ slides, eyebrow }: { slides: Slide[]; eyebrow: st
 
   return (
     <section
-      className="relative w-full h-screen min-h-[600px] max-h-[1000px] bg-neutral-900 overflow-hidden"
+      className="relative w-full min-h-[max(37.5rem,100svh)] max-h-[1000px] bg-neutral-900 overflow-hidden"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
     >
@@ -80,7 +80,7 @@ export function HeroCarousel({ slides, eyebrow }: { slides: Slide[]; eyebrow: st
 
       <div className="absolute bottom-20 sm:bottom-24 left-6 sm:left-14 lg:left-20 z-30 text-white max-w-3xl">
         <p className="text-[10px] uppercase tracking-[0.4em] mb-5 opacity-75">{eyebrow}</p>
-        <h1 className="font-serif text-5xl sm:text-6xl md:text-7xl lg:text-8xl leading-[0.93] mb-5">
+        <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl leading-[0.93] mb-5 break-words hyphens-auto">
           {slide.title}
         </h1>
         {slide.subtitle && (
